@@ -16,7 +16,7 @@ spec:
         doks.digitalocean.com/node-pool: pool-rollem
       containers:
       - name: rollem-ui
-        image: rollem/ui:2.11.2
+        image: rollem/ui:2.11.3
         ports:
         - containerPort: 3000
           protocol: TCP

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: rollem-next-02-deployment
+  name: rollem-next-05-deployment
 spec:
   selector:
     matchLabels:
@@ -15,7 +15,7 @@ spec:
       nodeSelector:
         doks.digitalocean.com/node-pool: pool-rollem
       containers:
-      - name: rollem-next-02
+      - name: rollem-next-05
         image: lemtzas/rollem-discord:2.10.2
         imagePullPolicy: IfNotPresent
         ports:
@@ -29,7 +29,7 @@ spec:
         - name: 'reboot'
           value: '2023-10-09.1'
         - name: DISCORD_BOT_SHARD_ID
-          value: '2'
+          value: '5'
         - name: DISCORD_BOT_SHARD_COUNT
           value: '8'
         - name: 'DISCORD_BOT_USER_TOKEN'
