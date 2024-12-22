@@ -18,6 +18,7 @@
     "sync:check": "yarn run sync list-mismatches",
     "sync:fix": "yarn run sync fix-mismatches --filter '^this-changes-the-default-to-none$'",
     "sync:fix:all": "yarn run sync fix-mismatches",
+    "setup-windows": "yarn exec ./scripts/setup.sh",
     "____________________workspaces (many)____________________": "multi-workspace commands. lower=sequential UPPER=PARALLEL",
     "all": "yarn workspaces foreach --all --topological --exclude root",
     "ALL": "yarn workspaces foreach --all --topological --parallel --exclude root",

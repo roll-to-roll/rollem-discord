@@ -1,6 +1,6 @@
 #!/bin/bash
 
-trap 'echo "Command exited with non-zero status"' ERR
+trap "echo 'Command exited with non-zero status $0'" ERR
 set -e
 
 # # Default variable values
