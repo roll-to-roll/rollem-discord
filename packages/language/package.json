@@ -1,7 +1,7 @@
 {
   "name": "@rollem/language",
   "description": "Rollem (Language) - Shared package for a dicebot and parser that supports a variety of roll syntax",
-  "version": "2.11.3",
+  "version": "2.11.4",
   "author": "David <npm@davidsharer.com>",
   "bugs": "https://github.com/rollem-discord/rollem-discord/issues",
   "dependencies": {
