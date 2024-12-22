@@ -183,13 +183,13 @@ ARG BUILD_STYLE="single"
   ENV NODE_ENV="$NODE_ENV"
 
   # Copying necessary Yarn Workspace packages
-  COPY --from=rollem-mstodon.switched.build /app/.yarn ./.yarn
-  COPY --from=rollem-mstodon.switched.build /app/package.json /app/.pnp.cjs /app/.yarnrc.yml /app/yarn.lock* ./
+  COPY --from=rollem-mastodon.switched.build /app/.yarn ./.yarn
+  COPY --from=rollem-mastodon.switched.build /app/package.json /app/.pnp.cjs /app/.yarnrc.yml /app/yarn.lock* ./
   
   # Copying necessary Yarn Workspace packages
-  COPY --from=rollem-mstodon.switched.build /app/packages/mastodon /app/packages/mastodon
-  COPY --from=rollem-mstodon.switched.build /app/packages/common /app/packages/common
-  COPY --from=rollem-mstodon.switched.build /app/packages/language /app/packages/language
+  COPY --from=rollem-mastodon.switched.build /app/packages/mastodon /app/packages/mastodon
+  COPY --from=rollem-mastodon.switched.build /app/packages/common /app/packages/common
+  COPY --from=rollem-mastodon.switched.build /app/packages/language /app/packages/language
   
   # Focus on the workspace project we care about
   RUN yarn workspaces focus @rollem/mastodon
