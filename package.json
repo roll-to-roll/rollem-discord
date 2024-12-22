@@ -55,6 +55,7 @@
     "infra-apply-ui": "kubectl apply -f ./infra/k8s/rollem-ui/",
     "infra-restart-prod": "sh -c 'kubectl rollout restart deployment rollem-prod-${0}-deployment'",
     "infra-restart-next": "sh -c 'kubectl rollout restart deployment rollem-next-${0}-deployment'",
+    "infra-restart-ui": "sh -c 'kubectl rollout restart deployment rollem-ui'",
     "infra-grafana-forward": "kubectl port-forward svc/kube-prometheus-stack-grafana 8080:80 -n monitoring",
     "____________________old____________________": "// TODO: Review",
     "?:ws:publish:all": "yarn workspaces foreach --all -pt npm publish `# https://yarnpkg.com/features/workspaces#parallel-execution`",
