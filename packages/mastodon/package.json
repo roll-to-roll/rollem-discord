@@ -1,7 +1,7 @@
 {
   "name": "@rollem/mastodon",
   "description": "Rollem (Mastodon Bot) - Bot Deployable",
-  "version": "2.11.4",
+  "version": "2.11.5",
   "author": "David <npm@davidsharer.com>",
   "bugs": "https://github.com/rollem-discord/rollem-discord/issues",
   "dependencies": {

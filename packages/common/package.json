@@ -1,7 +1,7 @@
 {
   "name": "@rollem/common",
   "description": "Rollem (Common) - Shared package for Rollem deployables",
-  "version": "2.11.4",
+  "version": "2.11.5",
   "author": "David <npm@davidsharer.com>",
   "_moduleAliases": {
     "@root": ".",

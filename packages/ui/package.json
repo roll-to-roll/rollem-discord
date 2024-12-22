@@ -1,7 +1,7 @@
 {
   "name": "@rollem/ui",
   "description": "Rollem (UI) - UI deployable",
-  "version": "2.11.4",
+  "version": "2.11.5",
   "author": "David <npm@davidsharer.com>",
   "bugs": "https://github.com/rollem-discord/rollem-discord/issues",
   "dependencies": {
