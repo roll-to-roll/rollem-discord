@@ -13,7 +13,7 @@ services:
     build:
       context: .
       dockerfile: workspace.Dockerfile
-      target: rollem-bot
+      target: rollem-discord
       args:
         BUILD_STYLE: global
 

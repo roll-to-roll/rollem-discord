@@ -19,7 +19,7 @@ on:
         type: string
 
       BUILD_TARGET_STAGE:
-        description: Name of the dockerfile stage target -- like 'rollem-ui', 'rollem-bot', or 'rollem-mastodon'
+        description: Name of the dockerfile stage target -- like 'rollem-ui', 'rollem-discord', or 'rollem-mastodon'
         required: true
         type: string
 

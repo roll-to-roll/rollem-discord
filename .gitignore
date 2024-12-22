@@ -6,6 +6,8 @@ node_modules/
 *.env
 !sample-*.env
 !.sample.env
+!*.sample.env
+
 
 #ignore all *-secrets.yaml unless they start with sample-
 *.secrets.yaml
@@ -37,3 +39,6 @@ dist/
 
 .nx/cache/*
 /generated_values.yaml
+
+# Local Postgres database
+database/

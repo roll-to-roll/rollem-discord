@@ -30,7 +30,7 @@ jobs:
     secrets: inherit
     with:
       IMAGE_NAME: discord
-      BUILD_TARGET_STAGE: rollem-bot
+      BUILD_TARGET_STAGE: rollem-discord
       tagging_method: version-tag
 
   mastodon:

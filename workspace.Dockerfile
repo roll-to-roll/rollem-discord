@@ -27,8 +27,8 @@
 ####################################################################################################
 # Variables
 ####################################################################################################
-# BUILD_STYLE="single" == use single-target builds; targeting `rollem-bot` only builds required deps
-# BUILD_STYLE="global" == use global builds; targeting `rollem-bot` will also build `ui` and `mastodon`
+# BUILD_STYLE="single" == use single-target builds; targeting `rollem-discord` only builds required deps
+# BUILD_STYLE="global" == use global builds; targeting `rollem-discord` will also build `ui` and `mastodon`
 ARG BUILD_STYLE="single"
 # ARG BUILD_STYLE="global"
 ####################################################################################################
@@ -57,7 +57,7 @@ ARG BUILD_STYLE="single"
   # Copy yarn support files (see https://gist.github.com/vanxh/0c3a62cc6bd6b8aa143c2e278d9e9dfa)
   COPY .yarn/ ./.yarn
   # COPY package.json .pnp.cjs .yarnrc.yml yarn.lock* ./
-  COPY package.json .yarnrc.yml yarn.lock* ./
+  COPY package.json .pnp.cjs .yarnrc.yml yarn.lock* ./
 
   # Copy packages
   COPY packages/ packages/
@@ -74,8 +74,8 @@ ARG BUILD_STYLE="single"
 ####################################################################################################
 
 ####################################################################################################
-# rollem-bot.build: Builds ONLY @rollem/bot -- the Discord bot
-  FROM workspace.deps AS rollem-bot.build
+# rollem-discord.build: Builds ONLY @rollem/bot -- the Discord bot
+  FROM workspace.deps AS rollem-discord.build
   RUN yarn docker:bot run build
 ####################################################################################################
 
@@ -104,9 +104,9 @@ ARG BUILD_STYLE="single"
 # The goal here is to have good cache behavior for both local dev and CI/CD publishing
 # - For local dev, use the default `--build-arg BUILD_STYLE=single` to only build the required package chain
 # - For packaging all three, use `--build-arg BUILD_STYLE=global` to build everything and cache that layer
-  FROM workspace.build AS rollem-bot.global.build
-  FROM rollem-bot.build AS rollem-bot.single.build
-  FROM rollem-bot.${BUILD_STYLE}.build AS rollem-bot.switched.build
+  FROM workspace.build AS rollem-discord.global.build
+  FROM rollem-discord.build AS rollem-discord.single.build
+  FROM rollem-discord.${BUILD_STYLE}.build AS rollem-discord.switched.build
 
   FROM workspace.build AS rollem-mastodon.global.build
   FROM rollem-mastodon.build AS rollem-mastodon.single.build
@@ -125,21 +125,31 @@ ARG BUILD_STYLE="single"
 ####################################################################################################
 
 ####################################################################################################
-# rollem-bot: Minimal container to run the (discord) bot
-  FROM base AS rollem-bot
+# rollem-discord: Minimal container to run the (discord) bot
+  FROM base AS rollem-discord
 
+  # We'll be setting this up as a clone of our workspace, with /app/packages/specific-package containing what we need
   WORKDIR /app
 
   # Labeling ( see https://github.com/opencontainers/image-spec/blob/main/annotations.md )
   LABEL "org.opencontainers.image.title"="Rollem Discord Bot"
-  LABEL "org.opencontainers.image.ref.name"="rollem/bot"
+  LABEL "org.opencontainers.image.ref.name"="rollem/discord"
   LABEL "org.opencontainers.image.url"="https://rollem.rocks"
   LABEL "org.opencontainers.image.documentation"="https://github.com/rollem-discord/rollem-discord"
   LABEL "org.opencontainers.image.source"="https://github.com/rollem-discord/rollem-discord"
 
-  # Copy the required bundle
-  COPY --from=rollem-bot.switched.build /app/packages/bot/dist ./dist
-  COPY --from=rollem-bot.switched.build /app/packages/bot/package.json package.json
+  # Copying necessary Yarn Workspace packages
+  COPY --from=rollem-discord.switched.build /app/.yarn ./.yarn
+  COPY --from=rollem-discord.switched.build /app/package.json /app/.pnp.cjs /app/.yarnrc.yml /app/yarn.lock* ./
+  
+  # Copying necessary Yarn Workspace packages
+  COPY --from=rollem-discord.switched.build /app/packages/bot /app/packages/bot
+  COPY --from=rollem-discord.switched.build /app/packages/common /app/packages/common
+  COPY --from=rollem-discord.switched.build /app/packages/language /app/packages/language
+  
+  # Focus on the workspace project we care about
+  RUN yarn workspaces focus @rollem/bot
+  WORKDIR /app/packages/bot
 
   # Env setup
   ARG NODE_ENV
@@ -150,12 +160,14 @@ ARG BUILD_STYLE="single"
   RUN yarn --version
 
   # Execution
-  CMD ["/bin/sh", "-c", "yarn run container:start"]
+  CMD yarn run container:start
 ####################################################################################################
 
 ####################################################################################################
 # Minimal container to run the mastodon bot
   FROM base AS rollem-mastodon
+
+  # We'll be setting this up as a clone of our workspace, with /app/packages/specific-package containing what we need
   WORKDIR /app
 
   # https://github.com/opencontainers/image-spec/blob/main/annotations.md
@@ -168,19 +180,30 @@ ARG BUILD_STYLE="single"
   # ONBUILD
   ARG NODE_ENV
   ENV NODE_ENV="$NODE_ENV"
+
+  # Copying necessary Yarn Workspace packages
+  COPY --from=rollem-mstodon.switched.build /app/.yarn ./.yarn
+  COPY --from=rollem-mstodon.switched.build /app/package.json /app/.pnp.cjs /app/.yarnrc.yml /app/yarn.lock* ./
   
-  # Copy the required bundle
-  COPY --from=rollem-mastodon.switched.build /app/packages/mastodon/dist ./dist
-  COPY --from=rollem-mastodon.switched.build /app/packages/mastodon/package.json package.json
+  # Copying necessary Yarn Workspace packages
+  COPY --from=rollem-mstodon.switched.build /app/packages/mastodon /app/packages/mastodon
+  COPY --from=rollem-mstodon.switched.build /app/packages/common /app/packages/common
+  COPY --from=rollem-mstodon.switched.build /app/packages/language /app/packages/language
+  
+  # Focus on the workspace project we care about
+  RUN yarn workspaces focus @rollem/mastodon
+  WORKDIR /app/packages/mastodon
 
   EXPOSE 8080
 
-  CMD ["/bin/sh", "-c", "yarn run container:start"]
+  CMD yarn run container:start
 ####################################################################################################
 
 ####################################################################################################
 # Minimal container to run the ui
   FROM base AS rollem-ui
+
+  # We'll be setting this up as a clone of our workspace, with /app/packages/specific-package containing what we need
   WORKDIR /app
 
   # https://github.com/opencontainers/image-spec/blob/main/annotations.md
@@ -190,24 +213,23 @@ ARG BUILD_STYLE="single"
   LABEL "org.opencontainers.image.documentation"="https://github.com/rollem-discord/rollem-discord"
   LABEL "org.opencontainers.image.source"="https://github.com/rollem-discord/rollem-discord"
 
-  # Copying core yarn files
+  # Copying necessary Yarn Workspace packages
   COPY --from=rollem-ui.switched.build /app/.yarn ./.yarn
   COPY --from=rollem-ui.switched.build /app/package.json /app/.pnp.cjs /app/.yarnrc.yml /app/yarn.lock* ./
   
-  # Copying package dependencies
+  # Copying necessary Yarn Workspace packages
   COPY --from=rollem-ui.switched.build /app/packages/ui /app/packages/ui
   COPY --from=rollem-ui.switched.build /app/packages/common /app/packages/common
   COPY --from=rollem-ui.switched.build /app/packages/language /app/packages/language
   
-  # Focused install of dependencies
+  # Focus on the workspace project we care about
   RUN yarn workspaces focus @rollem/ui
+  WORKDIR /app/packages/ui
   
   # Env setup
   EXPOSE 3000
   ENV PORT=3000
   ENV HOSTNAME="0.0.0.0"
   
-  # Execute within directory
-  WORKDIR /app/packages/ui
   CMD yarn start
 ####################################################################################################

@@ -1,36 +1,30 @@
 services:
+  # Database is required for persistence
   database:
     image: postgres
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_PASSWORD: local
-      POSTGRES_USER: rollem-dev
-      POSTGRES_DB: rollem-dev
-
-  database-persist:
-    image: postgres
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_PASSWORD: local
-      POSTGRES_USER: rollem-dev
-      POSTGRES_DB: rollem-dev
     volumes:
       - ./database:/var/lib/postgresql
-  
-  # TODO: This uses an old version of rollem. It seems the `latest` tag has not updated
-  rollem-minimal:
-    image: lemtzas/rollem-discord
-    environment:
-      DISCORD_BOT_USER_TOKEN: <your bot token here>
+    env_file:
+      - ./secrets/docker.env
 
-  rollem-database:
-    image: lemtzas/rollem-discord:2.9.6
+  # Rollem UI
+  rollem-ui:
+    image: rollem/ui
+    ports:
+      - "9000:9000"
+      - "3000:3000"
     depends_on:
       - database
-    environment:
-      DISCORD_BOT_USER_TOKEN: <your bot token here>
-      DB_CONNECTION_STRING: postgresql://rollem-dev:local@database/rollem-dev
-      DB_DISABLE_SSL: 'true'
+    env_file:
+      - ./secrets/docker.env # Requires configuration for (local) login to work
+
+  # Rollem Discord Bot
+  rollem-discord:
+    image: rollem/discord
+    depends_on:
+      - database
+    env_file:
+      - ./secrets/docker.env # Requires configuration for to work
 

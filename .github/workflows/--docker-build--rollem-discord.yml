@@ -13,7 +13,7 @@ jobs:
 
     - name: Build Image
       working-directory: .
-      run: docker build -f workspace.Dockerfile . --target rollem-bot --label='rollem-discord' -t rollem-discord
+      run: docker build -f workspace.Dockerfile . --target rollem-discord --label='rollem-discord' -t rollem-discord
 
     - name: Export Image
       working-directory: .
