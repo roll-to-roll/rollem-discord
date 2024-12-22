@@ -8,3 +8,4 @@ cd "$(dirname "${BASH_SOURCE[0]}")"
 echo
 echo "# Performing scripted setup"
 ./setup--k8s.sh
+./setup--github.sh

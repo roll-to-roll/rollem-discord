@@ -10,14 +10,14 @@ DOCTL_CLUSTER_NAME="rollem-sfo2"
 echo
 echo "### Checking for tokens (and switching context to '$DOCTL_CONTEXT_NAME')"
 if ! doctl auth switch --context "$DOCTL_CONTEXT_NAME" ; then
-  echo "### Auth not found -- Initializing '$DOCTL_CONTEXT_NAME'"
+  echo "#### Auth not found -- Initializing '$DOCTL_CONTEXT_NAME'"
   echo "See https://docs.digitalocean.com/reference/api/create-personal-access-token/ for instructions"
   doctl auth init --interactive --context "$DOCTL_CONTEXT_NAME"
   echo
-  echo "### Switching context to '$DOCTL_CONTEXT_NAME'"
+  echo "#### Switching context to '$DOCTL_CONTEXT_NAME'"
   doctl auth switch --context "$DOCTL_CONTEXT_NAME"
 else
-  echo "### Auth found -- Context switched to '$DOCTL_CONTEXT_NAME'"
+  echo "#### Auth found -- Context switched to '$DOCTL_CONTEXT_NAME'"
 fi
 
 echo
