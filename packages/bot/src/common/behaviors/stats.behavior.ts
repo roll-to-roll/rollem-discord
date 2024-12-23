@@ -8,7 +8,7 @@ import { BehaviorStatsBase } from "@common/stats-base";
 import { Injectable } from "injection-js";
 import { toPairs } from "lodash";
 
-/** A ping-pong behavior for testing. */
+/** A behavior that dumps some stats and info about the current bot. */
 @Injectable()
 export class StatsBehavior extends BehaviorBase {
   constructor(

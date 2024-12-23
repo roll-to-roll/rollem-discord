@@ -4,6 +4,7 @@ import { Client, Message, User, MessageReaction } from "discord.js";
 import { Logger, LoggerCategory } from "@bot/logger";
 import { Injectable } from "injection-js";
 import { PromLogger } from "@bot/prom-logger";
+import { Config } from "@bot/config";
 
 // TODO: there's got to be a cleaner way to handle this, but this seems to make it more resilient.
 
@@ -20,6 +21,7 @@ export class DeadmanSwitchBehavior extends DiscordBehaviorBase {
     client: Client,
     promLogger: PromLogger,
     logger: Logger,
+    private readonly config: Config
   ) { super(client, promLogger, logger); }
 
   private activityInLastMinute = 0;
@@ -75,7 +77,8 @@ export class DeadmanSwitchBehavior extends DiscordBehaviorBase {
       while (!message) {
         try {
           botOwner = await this.client.users.fetch("105641015943135232"); // this is me. i couldn't message the bot itself.
-          message = await botOwner.send(`shard '${this.logger.shardName()}' - ready ${counter}`) as Message;
+          const diagnosticMode = this.config.inLocalDiagnosticMode ? "__**`[DIAGNOSTIC]`**__ " : "";
+          message = await botOwner.send(`${diagnosticMode}shard '${this.logger.shardName()}' - ready ${counter}`) as Message;
         } catch {
           await promisify(setTimeout)(DeadmanSwitchBehavior.TimeWindowDuration / 3);
         }

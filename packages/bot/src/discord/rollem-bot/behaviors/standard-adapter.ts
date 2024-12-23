@@ -23,12 +23,17 @@ export class StandardAdapter extends DiscordBehaviorBase {
     @Inject(BehaviorBase) private readonly behaviors: BehaviorBase[],
   ) {
     super(client, promLogger, logger);
-    const behaviorNames = behaviors.map(b => b.constructor.name);
-    console.log("Found Standard Behaviors", behaviorNames);
   }
   /** Applies the behavior to the given client. */
   public async apply(): Promise<void> {
-    this.logger.trackSimpleEvent(LoggerCategory.BehaviorRegistration, `Registering Behavior: ${this.constructor.name}`)
+    let behaviorNames = this.behaviors.map(b => b.constructor.name);
+    const registrationNotes: Record<string, unknown> = {};
+    if (this.config.inLocalDiagnosticMode) {
+      registrationNotes.LOCAL_DIAGNOSTIC_MODE = "ENABLED - Replies Disabled";
+      behaviorNames = behaviorNames.map(b => ` DIAGNOSTIC MDOE - Replies Disabled - Check Console - [${b}]`)
+    }
+    registrationNotes.behaviorNames = behaviorNames;
+    this.logger.trackSimpleEvent(LoggerCategory.BehaviorRegistration, `Registering Behavior: ${this.constructor.name}`, registrationNotes)
     await this.register();
   }
 
@@ -50,7 +55,7 @@ export class StandardAdapter extends DiscordBehaviorBase {
   }
 
   private async buildContext(message: Message): Promise<BehaviorContext> {
-    console.log({event: 'buildContext-1', authorId: message.author.id, content: message.content, timestamp: new Date().toISOString()});
+    // console.log({event: 'buildContext-1', authorId: message.author.id, content: message.content, timestamp: new Date().toISOString()});
     let user: DatabaseFailure | User;
     try {
       user = await this.storage.getOrCreateUser(message.author.id);
@@ -135,9 +140,17 @@ export class StandardAdapter extends DiscordBehaviorBase {
 
       // console.log({event: 'handleAll-2', label: behavior.label, context, preparedMessage, behavior, result});
       if (result) {
-        this.logger.trackMessageEvent(LoggerCategory.BehaviorEvent, `${behavior.label}`, message, { result });
-        message.reply(result.response).catch(rejected => this.handleSendRejection(message));
+        this.handleReply(behavior, message, result);
       }
+    }
+  }
+
+  private handleReply(behavior: BehaviorBase, message: Message<boolean>, result: BehaviorResponse) {
+    if (!this.config.inLocalDiagnosticMode) {
+      this.logger.trackMessageEvent(LoggerCategory.BehaviorEvent, `${behavior.label}`, message, { result });
+      message.reply(result.response).catch(rejected => this.handleSendRejection(message));
+    } else {
+      this.logger.trackMessageEvent(LoggerCategory.BehaviorEvent, `[DIAGNOSTIC - REPLY NOT SENT] ${behavior.label}`, message, { result });
     }
   }
 

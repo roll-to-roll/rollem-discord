@@ -87,14 +87,14 @@ export class Logger {
     if (ignoredCategories.includes(category)) { return; }
     
     if (this.aiClient) {
-      console.log(name, message, properties);
+      console.log(name, /*message,*/ properties);
       this.aiClient.trackEvent({
         name: name,
         measurements: this.enrichAIMetrics(message),
         properties: this.enrichAIProperties(message, properties)
       });
     } else {
-      console.log(name, message, properties);
+      console.log(name, /*message,*/ properties);
     }
   }
 
@@ -117,7 +117,7 @@ export class Logger {
     if (ignoredCategories.includes(category)) { return; }
     
     if (this.aiClient) {
-      console.error(name, message, util.inspect(error));
+      console.error(name, /*message,*/ util.inspect(error));
       error = error || new Error(name);
       this.aiClient.trackException({
         exception: error,
@@ -128,7 +128,7 @@ export class Logger {
         }
       })
     } else {
-      console.error(name, message, util.inspect(error));
+      console.error(name, /*message,*/ util.inspect(error));
     }
   }
 

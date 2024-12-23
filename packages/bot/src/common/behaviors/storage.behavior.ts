@@ -26,7 +26,7 @@ export class StorageBehavior extends BehaviorBase {
   public async onDirectPing(trigger: Trigger, content: string, context: BehaviorContext): Promise<BehaviorResponse | null> {
     var commands = content.split(/\s+/);
     var i = 0;
-    console.log({source: this.label, trigger, content, context});
+    // console.log({source: this.label, trigger, content, context});
     if (commands[i].toLowerCase() !== "storage") { return null; }
 
     if (isDatabaseFailure(context.user)) {

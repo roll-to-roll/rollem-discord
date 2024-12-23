@@ -10,7 +10,7 @@ import { ContainerV1, OldContainer } from "@rollem/language";
 import { Injectable } from "injection-js";
 import _, { chain, chunk } from "lodash";
 
-/** A ping-pong behavior for testing. */
+/** A behavior that rolls dice. */
 @Injectable()
 export abstract class DiceBehaviorBase extends BehaviorBase {
   constructor(

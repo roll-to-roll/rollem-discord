@@ -5,7 +5,7 @@ import { BehaviorResponse } from "@common/behavior-response";
 import { BehaviorBase, Trigger } from "@common/behavior.base";
 import { Injectable } from "injection-js";
 
-/** A ping-pong behavior for testing. */
+/** A ping-pong behavior for simple testing. */
 @Injectable()
 export class PingPongBehavior extends BehaviorBase {
   public label = 'ping-pong';

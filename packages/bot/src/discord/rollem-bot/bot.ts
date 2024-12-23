@@ -43,7 +43,7 @@ const ORDERED_DISCORD_BEHAVIORS: Newable<DiscordBehaviorBase>[] = [
   StandardAdapter,
 ];
 
-async function bootstrap() {
+export async function bootstrapSingleBot() {
   const topLevelInjector    = Bootstrapper.buildTopLevelProviders();
                               await Bootstrapper.prepareStorage(topLevelInjector);
                               Bootstrapper.prepareChangelog(topLevelInjector);
@@ -52,5 +52,3 @@ async function bootstrap() {
                               await Bootstrapper.attachBehaviorsToClient(clientLevelInjector, ORDERED_DISCORD_BEHAVIORS);
                               Bootstrapper.startClient(clientLevelInjector);
 }
-
-bootstrap();

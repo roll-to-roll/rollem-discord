@@ -6,7 +6,7 @@ import { BehaviorResponse } from "@common/behavior-response";
 import { BehaviorBase, Trigger } from "@common/behavior.base";
 import { Injectable } from "injection-js";
 
-/** A ping-pong behavior for testing. */
+/** A behavior that dumps the changelog. */
 @Injectable()
 export class ChangelogBehavior extends BehaviorBase {
   public label = 'changelog';

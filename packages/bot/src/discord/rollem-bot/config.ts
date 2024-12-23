@@ -30,8 +30,20 @@ export class Config {
     }
   }
 
+  /** When true, indicates Rollem should launch in a local diagnostic mode, and not send any replies. */
+  public get inLocalDiagnosticMode(): boolean {
+    return (process.env.ROLLEM_LOCAL_DIAGNOSTIC_MODE ?? "false").toLowerCase() === "true";
+  }
+
   /** The user token for Discord. */
-  public readonly Token = process.env.DISCORD_BOT_USER_TOKEN;
+  public get Token(): string {
+    var token = process.env.DISCORD_BOT_USER_TOKEN;
+    if (!token) {
+      throw new Error("DISCORD_BOT_USER_TOKEN not set");
+    }
+
+    return token;
+  }
 
   /** The client IDs to defer to. If any of these clients are present in a channel, do not respond. */
   public readonly deferToClientIds = (process.env.DEFER_TO_CLIENT_IDS || '').split(',');

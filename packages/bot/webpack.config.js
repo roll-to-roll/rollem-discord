@@ -3,7 +3,7 @@ const nodeExternals = require('webpack-node-externals');
 const path = require('path');
 
 const config = {
-  entry: './src/discord/rollem-bot/bot.ts',
+  entry: './src/entrypoint.ts',
   target: 'node',
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
   ignoreWarnings: [
@@ -66,6 +66,7 @@ const config = {
     alias: {
       "@bot": path.resolve(__dirname, "src/discord/rollem-bot/"),
       "@common": path.resolve(__dirname, "src/common/"),
+      "@root": path.resolve(__dirname, "src/"),
     },
   },
   devtool: 'cheap-module-source-map',

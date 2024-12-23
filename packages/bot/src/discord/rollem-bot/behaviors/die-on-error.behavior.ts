@@ -58,6 +58,7 @@ export class DieOnErrorBehavior extends DiscordBehaviorBase {
     this.logger.trackError(LoggerCategory.SystemEvent, `unhandled rejection - ${reason} - ${util.inspect(reason)}`);
 
     this.logger.flush();
+    process.exit(0);
   }
 
   
