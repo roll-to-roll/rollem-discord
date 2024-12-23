@@ -1,14 +1,16 @@
 const { IgnorePlugin } = require('webpack');
 const nodeExternals = require('webpack-node-externals');
-const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
-const CopyPlugin = require("copy-webpack-plugin");
 const path = require('path');
-const WebpackShellPluginNext = require('webpack-shell-plugin-next');
 
 const config = {
   entry: './src/discord/rollem-bot/bot.ts',
   target: 'node',
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
+  ignoreWarnings: [
+    { message: /the request of a dependency is an expression/, }, // TypeORM spams these
+    { message: /supports-color.*?a peer dependency/ }, // I blame TypeORM 
+    { message: /tried to access .*?\(a peer dependency\) but it isn't provided by its ancestors/ }, // Appears to be a Yarn Berry bug https://github.com/yarnpkg/berry/issues/5153
+  ],
   plugins: [
     // TODO: I'm not sure why all these are showing up here, since I thought they'd be already excluded from the dependencies list by the bundling?
     new IgnorePlugin({ resourceRegExp: /^pg-native$/}), // typeorm peer dependency
@@ -29,7 +31,6 @@ const config = {
     new IgnorePlugin({ resourceRegExp: /^@sap\/hana-client$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^mongodb$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^@google-cloud\/spanner$/}), // typeorm peer dependency
-    // new IgnorePlugin({ resourceRegExp: /^supports-color$/}), // debug optional peer dependency? Breaks runtime if ignored.
     new IgnorePlugin({ resourceRegExp: /^zlib-sync$/ }), // discord-ws dependency
     new IgnorePlugin({ resourceRegExp: /^stack-chain$/, contextRegExp: /cls-hooked/ }), // cls-hooked dependency
     new IgnorePlugin({ resourceRegExp: /^bufferutil$/ }), // ws peer dependency
@@ -40,17 +41,6 @@ const config = {
     new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/sdk-trace-base$/ }), // ???
     new IgnorePlugin({ resourceRegExp: /^@azure\/functions-core$/ }), // ???
     new IgnorePlugin({ resourceRegExp: /^applicationinsights-native-metrics$/ }), // ???
-    new FilterWarningsPlugin({
-      exclude: [
-        /the request of a dependency is an expression/, // TypeORM spams these
-        /supports-color.*?a peer dependency/, // I blame TypeORM 
-      ],
-    }),
-    // new CopyPlugin({
-    //   patterns: [
-    //     { from: "**/*", to: "" },
-    //   ],
-    // }),
   ],
   node: {
     global: true,

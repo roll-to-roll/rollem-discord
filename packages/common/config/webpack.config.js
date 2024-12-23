@@ -1,6 +1,5 @@
 const path = require('path')
 const { IgnorePlugin } = require('webpack');
-const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 
 module.exports = {
   mode: 'production',
@@ -11,6 +10,10 @@ module.exports = {
     __filename: false,
     __dirname: false,
   },
+  ignoreWarnings: [
+    { message: /the request of a dependency is an expression/, }, // TypeORM spams these
+    { message: /tried to access .*?\(a peer dependency\) but it isn't provided by its ancestors/ }, // Appears to be a Yarn Berry bug https://github.com/yarnpkg/berry/issues/5153
+  ],
   plugins: [
     new IgnorePlugin({ resourceRegExp: /^pg-native$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^react-native-sqlite-storage$/}), // typeorm peer dependency
@@ -31,17 +34,6 @@ module.exports = {
     new IgnorePlugin({ resourceRegExp: /^mongodb$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^@google-cloud\/spanner$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^supports-color$/}), // debug optional peer dependency?
-    new FilterWarningsPlugin({
-      exclude: [
-        // /typeorm.*?peer dependency/,
-        /the request of a dependency is an expression/, // type ORM spams these
-      ],
-    }),
-    // new CopyPlugin({
-    //   patterns: [
-    //     { from: "**/*", to: "" },
-    //   ],
-    // }),
   ],
   output: {
     path: path.resolve(__dirname, '../dist/umd'),

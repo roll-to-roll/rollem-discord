@@ -1,0 +1,18 @@
+{
+  "name": "@rollem-resources/discord-single",
+  "description": "Contains utilities for testing single-shard launches of Rollem Discord Bot",
+  "packageManager": "yarn@4.5.0",
+  "private": true,
+  "scripts": {
+    "____________________note01____________________": "all commands prefixed with `:` need review // TODO: Review",
+    "____________________note02____________________": "all non-pinned commands should be prefixed with `::<scope>:` to avoid cross-workspace build actions",
+    "____________________note03a____________________": "build = fresh-build",
+    "____________________note03b____________________": "watch = fresh-build -> watch",
+    "____________________note03c____________________": "dev = fresh-build -> watch -> live-update",
+    "____________________note03d____________________": "start = only start",
+    "____________________note04e____________________": "package = fresh build + package",
+    "__________________________________________________": "end of notes",
+    "____________________pinned____________________": "common commands",
+    "up": "docker compose up --build"
+  }
+}

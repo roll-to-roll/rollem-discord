@@ -1,0 +1,36 @@
+include:
+  - ../database/compose.yaml
+  
+services:
+
+  rollem-discord--1-of-2:
+    image: rollem/discord
+    env_file:
+      - ../../secrets/docker.env # Requires configuration for to work
+    environment:
+      DISCORD_BOT_SHARD_COUNT: 2
+      DISCORD_BOT_SHARD_ID: 0
+    depends_on:
+      - database
+    build:
+      context: ../..
+      dockerfile: workspace.Dockerfile
+      target: rollem-discord
+      args:
+        BUILD_STYLE: single
+
+  rollem-discord--2-of-2:
+    image: rollem/discord
+    env_file:
+      - ../../secrets/docker.env # Requires configuration for to work
+    environment:
+      DISCORD_BOT_SHARD_COUNT: 2
+      DISCORD_BOT_SHARD_ID: 1
+    depends_on:
+      - database
+    build:
+      context: ../..
+      dockerfile: workspace.Dockerfile
+      target: rollem-discord
+      args:
+        BUILD_STYLE: single

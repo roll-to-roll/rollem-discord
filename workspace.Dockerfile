@@ -44,7 +44,27 @@ ARG BUILD_STYLE="single"
 ####################################################################################################
 
 ####################################################################################################
-# workspace.deps: Preps the entire workspace
+# workspace.deps.precursor: Copy only the package files to avoid busting the dep cache when unnecessary
+# see https://stackoverflow.com/questions/49939960/docker-copy-files-using-glob-pattern
+  FROM base AS workspace.deps.precursor
+  WORKDIR /app
+
+  # Copy yarn support files (see https://gist.github.com/vanxh/0c3a62cc6bd6b8aa143c2e278d9e9dfa)
+  COPY .yarn/ ./.yarn
+  # COPY package.json .pnp.cjs .yarnrc.yml yarn.lock* ./
+  # .pnp.cjs is intentionally excluded as its inclusion causes errors in the CI/CD pipeline
+  COPY package.json .yarnrc.yml yarn.lock* ./
+
+  # Copy all packages (this will alwways break the cache, but should be fast)
+  COPY packages/ packages/
+  COPY resources/ resources/
+
+  # remove any file that is not like /app/**/package.json
+  RUN find packages \! -name "package.json" -mindepth 2 -maxdepth 2 -print | xargs rm -rf
+####################################################################################################
+
+####################################################################################################
+# workspace.deps: Preps the entire workspace's dependencies
   FROM base AS workspace.deps
 
   # Tree is a useful inspection tool
@@ -54,14 +74,8 @@ ARG BUILD_STYLE="single"
   RUN apk add --no-cache libc6-compat
   WORKDIR /app
 
-  # Copy yarn support files (see https://gist.github.com/vanxh/0c3a62cc6bd6b8aa143c2e278d9e9dfa)
-  COPY .yarn/ ./.yarn
-  # COPY package.json .pnp.cjs .yarnrc.yml yarn.lock* ./
-  # .pnp.cjs is intentionally excluded as its inclusion causes errors in the CI/CD pipeline
-  COPY package.json .yarnrc.yml yarn.lock* ./
-
-  # Copy packages
-  COPY packages/ packages/
+  # Copying necessary Yarn Workspace packages
+  COPY --from=workspace.deps.precursor /app/ .
 
   # Install packages
   RUN yarn --version
@@ -75,26 +89,51 @@ ARG BUILD_STYLE="single"
 ####################################################################################################
 
 ####################################################################################################
+# rollem-common.build: Builds ONLY @rollem/common -- the common package
+  FROM workspace.deps AS rollem-common.build
+  COPY packages/common /app/packages/common
+  RUN yarn common run build
+####################################################################################################
+
+####################################################################################################
+# rollem-language.build: Builds ONLY @rollem/language -- the language package
+  FROM workspace.deps AS rollem-language.build
+  COPY --from=rollem-common.build /app/packages/common/dist /app/packages/common/dist
+  COPY packages/language /app/packages/language
+  RUN yarn language run build
+####################################################################################################
+
+####################################################################################################
 # rollem-discord.build: Builds ONLY @rollem/bot -- the Discord bot
   FROM workspace.deps AS rollem-discord.build
-  RUN yarn docker:bot run build
+  COPY --from=rollem-common.build /app/packages/common/dist /app/packages/common/dist
+  COPY --from=rollem-language.build /app/packages/language/dist /app/packages/language/dist
+  COPY packages/bot /app/packages/bot
+  RUN yarn bot run build
 ####################################################################################################
 
 ####################################################################################################
 # rollem-mastodon.build: Builds ONLY @rollem/mastodon -- the Mastodon bot
   FROM workspace.deps AS rollem-mastodon.build
-  RUN yarn docker:mastodon run build
+  COPY --from=rollem-common.build /app/packages/common/dist /app/packages/common/dist
+  COPY --from=rollem-language.build /app/packages/language/dist /app/packages/language/dist
+  COPY packages/mastodon /app/packages/mastodon
+  RUN yarn mastodon run build
 ####################################################################################################
 
 ####################################################################################################
 # rollem-ui.build: Builds ONLY @rollem/ui -- the website
   FROM workspace.deps AS rollem-ui.build
-  RUN yarn docker:ui run build
+  COPY --from=rollem-common.build /app/packages/common/dist /app/packages/common/dist
+  COPY --from=rollem-language.build /app/packages/language/dist /app/packages/language/dist
+  COPY packages/ui /app/packages/ui
+  RUN yarn ui run build
 ####################################################################################################
 
 ####################################################################################################
 # workspace.build: Builds everything
   FROM workspace.deps AS workspace.build
+  COPY packages /app/packages
   RUN yarn run build
 ####################################################################################################
 
@@ -126,7 +165,7 @@ ARG BUILD_STYLE="single"
 ####################################################################################################
 
 ####################################################################################################
-# rollem-discord: Minimal container to run the (discord) bot
+# rollem-discord: Minimal container to run the discord bot
   FROM base AS rollem-discord
 
   # We'll be setting this up as a clone of our workspace, with /app/packages/specific-package containing what we need
@@ -144,12 +183,8 @@ ARG BUILD_STYLE="single"
   COPY --from=rollem-discord.switched.build /app/package.json /app/.pnp.cjs /app/.yarnrc.yml /app/yarn.lock* ./
   
   # Copying necessary Yarn Workspace packages
-  COPY --from=rollem-discord.switched.build /app/packages/bot /app/packages/bot
-  COPY --from=rollem-discord.switched.build /app/packages/common /app/packages/common
-  COPY --from=rollem-discord.switched.build /app/packages/language /app/packages/language
-  
-  # Focus on the workspace project we care about
-  RUN yarn workspaces focus @rollem/bot
+  COPY --from=rollem-discord.switched.build /app/packages /app/packages
+
   WORKDIR /app/packages/bot
 
   # Env setup
@@ -187,12 +222,8 @@ ARG BUILD_STYLE="single"
   COPY --from=rollem-mastodon.switched.build /app/package.json /app/.pnp.cjs /app/.yarnrc.yml /app/yarn.lock* ./
   
   # Copying necessary Yarn Workspace packages
-  COPY --from=rollem-mastodon.switched.build /app/packages/mastodon /app/packages/mastodon
-  COPY --from=rollem-mastodon.switched.build /app/packages/common /app/packages/common
-  COPY --from=rollem-mastodon.switched.build /app/packages/language /app/packages/language
-  
-  # Focus on the workspace project we care about
-  RUN yarn workspaces focus @rollem/mastodon
+  COPY --from=rollem-mastodon.switched.build /app/packages /app/packages
+
   WORKDIR /app/packages/mastodon
 
   EXPOSE 8080
@@ -219,12 +250,8 @@ ARG BUILD_STYLE="single"
   COPY --from=rollem-ui.switched.build /app/package.json /app/.pnp.cjs /app/.yarnrc.yml /app/yarn.lock* ./
   
   # Copying necessary Yarn Workspace packages
-  COPY --from=rollem-ui.switched.build /app/packages/ui /app/packages/ui
-  COPY --from=rollem-ui.switched.build /app/packages/common /app/packages/common
-  COPY --from=rollem-ui.switched.build /app/packages/language /app/packages/language
-  
-  # Focus on the workspace project we care about
-  RUN yarn workspaces focus @rollem/ui
+  COPY --from=rollem-ui.switched.build /app/packages /app/packages
+
   WORKDIR /app/packages/ui
   
   # Env setup

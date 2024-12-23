@@ -5,7 +5,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./database:/var/lib/postgresql
+      - ./resources/database/.storage/data:/var/lib/postgresql/data
     env_file:
       - ./secrets/docker.env
 

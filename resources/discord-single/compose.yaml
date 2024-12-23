@@ -1,0 +1,17 @@
+include:
+  - ../database/compose.yaml
+
+services:
+
+  rollem-discord:
+    image: rollem/discord
+    env_file:
+      - ../../secrets/docker.env # Requires configuration for to work
+    depends_on:
+      - database
+    build:
+      context: ../..
+      dockerfile: workspace.Dockerfile
+      target: rollem-discord
+      args:
+        BUILD_STYLE: single

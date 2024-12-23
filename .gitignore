@@ -39,6 +39,3 @@ dist/
 
 .nx/cache/*
 /generated_values.yaml
-
-# Local Postgres database
-database/

@@ -1,0 +1,6 @@
+{
+  "name": "@rollem-resources/database",
+  "description": "Contains utilities relating to the database",
+  "private": true,
+  "packageManager": "yarn@4.5.0"
+}
