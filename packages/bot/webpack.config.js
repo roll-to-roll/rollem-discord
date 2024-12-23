@@ -3,7 +3,16 @@ const nodeExternals = require('webpack-node-externals');
 const path = require('path');
 
 const config = {
-  entry: './src/entrypoint.ts',
+  entry: {
+    entrypoint: {
+      import: './src/entrypoint.ts',
+      filename: "bundle.js",
+    },
+    entrypointSingleShard: {
+      import: './src/entrypoint-single-shard.ts',
+      filename: "bundle-single-shard.js",
+    },
+  },
   target: 'node',
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
   ignoreWarnings: [

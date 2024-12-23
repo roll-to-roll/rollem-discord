@@ -4,11 +4,8 @@ import nodeFetch from 'node-fetch';
 import util from 'util';
 global.fetch = nodeFetch as any;
 
-import { bootstrapSingleBot } from "@bot/bot";
-import { APIGatewayBotInfo, fetchRecommendedShardCount } from "discord.js";
+import { ShardingManager, ShardingManagerOptions } from "discord.js";
 import { Config } from "@bot/config";
-import moment from "moment";
-import { values } from "lodash";
 import { fetchGatewayBotInfo, groupShardsByRateLimitKey } from "./discord/startup";
 
 const config = new Config();
@@ -22,4 +19,18 @@ console.debug("Selected Bucket:", ourBucket);
 // console.debug("Bot Info:", grouping);
 // for (const group of values(grouping.rateLimitBuckets)) { console.debug("Groupings", group); }
 
-await bootstrapSingleBot();
+// await bootstrapSingleBot();
+
+const options: ShardingManagerOptions = {
+  token: config.Token,
+  totalShards: ourBucket.totalShardCount,
+  shardList: ourBucket.shardIds,
+};
+const manager = new ShardingManager('./dist/bundle-single-shard.js', options);
+
+manager.on('shardCreate', shard => {
+  console.debug();
+  console.debug(`Launched shard`, shard.id);
+});
+
+manager.spawn();

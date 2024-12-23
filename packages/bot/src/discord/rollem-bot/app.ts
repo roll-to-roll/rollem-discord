@@ -1,6 +1,7 @@
 import express from 'express';
 import * as client from 'prom-client';
 import { Config } from './config';
+import { Server } from 'http';
 
 const app = express();
 const port = 8081;
@@ -27,11 +28,17 @@ app.get('/', async (req, res) => {
   }
 });
 
-app.listen(port, () => {
-  console.log(`listening on port ${port}.`);
-});
+const server: Server | undefined = undefined;; 
 
 /** The express app. */
 export class App {
   private readonly app = app;
+
+  constructor() {
+    if (!server) {
+      const server = this.app.listen(port, () => {
+        console.log(`listening on port ${port}.`);
+      });
+    }
+  }
 }

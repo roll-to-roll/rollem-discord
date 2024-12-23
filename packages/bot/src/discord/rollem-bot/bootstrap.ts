@@ -17,40 +17,49 @@ import { Newable } from "./lib/utility-types";
 import { RepliedMessageCache } from "./lib/replied-message-cache";
 import { Storage } from "@rollem/common";
 import { BehaviorBase } from "@common/behavior.base";
-import { ClassProvider } from "injection-js";
+import { ClassProvider, Provider } from "injection-js";
 import { BehaviorStatsBase } from "@common/stats-base";
 import { DiscordStats } from "../discord-stats";
 import { strict } from "assert";
 import { RollemParserV1, RollemParserV1Beta, RollemParserV2 } from "@rollem/language";
 import { RollemRandomSources } from "./lib/rollem-random-sources";
+import { defaults } from "lodash";
 
 // tslint:disable-next-line: no-namespace
 export namespace Bootstrapper {
   /** Constructs the upper-most DI context for the bot. */
-  export function buildTopLevelProviders() {
+  export function buildTopLevelProviders(options?: { skipPromEndpoints: boolean}) {
+
+    options = defaults({}, options, { skipPromEndpoints: false })!;
     // tslint:disable-next-line: no-console
     console.log("Setting up top-level DI");
+    const providers: Provider[] = 
+    [
+      PromLogger,
+      Logger,
+      ChangeLog,
+      RollemRandomSources,
+      Config,
+      { provide: Storage, useValue: new Storage() },
+      RollemParserV1,
+      RollemParserV1Beta,
+      RollemParserV2,
+      Parsers,
+      RepliedMessageCache,
+    ];
+
+    if (!options.skipPromEndpoints)
+      providers.push(App);
+
     const topLevelInjector =
-      InjectorWrapper.createTopLevelContext(
-        [
-          App,
-          Logger,
-          ChangeLog,
-          PromLogger,
-          RollemRandomSources,
-          Config,
-          { provide: Storage, useValue: new Storage() },
-          RollemParserV1,
-          RollemParserV1Beta,
-          RollemParserV2,
-          Parsers,
-          RepliedMessageCache,
-        ]);
+      InjectorWrapper.createTopLevelContext(providers);
 
     const promLogger = topLevelInjector.get(PromLogger);
     strict(!!promLogger, "DI failed to resolve promLogger (prometheus)");
-    const app = topLevelInjector.get(App);
-    strict(!!app, "DI failed to resolve app (express api)");
+    if (!options.skipPromEndpoints) {
+      const app = topLevelInjector.get(App);
+      strict(!!app, "DI failed to resolve app (express api)");
+    }
     const logger = topLevelInjector.get(Logger);
     strict(!!logger, "DI failed to resolve logger");
     const config = topLevelInjector.get(Config);
@@ -135,7 +144,7 @@ export namespace Bootstrapper {
         intents,
         partials,
         shardCount: config.ShardCount,
-        shards: config.ShardId }
+        shards: config.ShardId}
       : { intents, partials };
     const client = new Client(clientOptions);
     logger.client = client;
