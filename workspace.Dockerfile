@@ -169,9 +169,7 @@ ARG BUILD_STYLE="single"
   
   # Copying necessary Yarn Workspace packages
   COPY --from=rollem-discord.switched.build /app/packages /app/packages
-  
-  # Focus on the workspace project we care about
-  RUN yarn workspaces focus @rollem/bot
+
   WORKDIR /app/packages/bot
 
   # Env setup
@@ -210,9 +208,7 @@ ARG BUILD_STYLE="single"
   
   # Copying necessary Yarn Workspace packages
   COPY --from=rollem-mastodon.switched.build /app/packages /app/packages
-  
-  # Focus on the workspace project we care about
-  RUN yarn workspaces focus @rollem/mastodon
+
   WORKDIR /app/packages/mastodon
 
   EXPOSE 8080
@@ -240,9 +236,7 @@ ARG BUILD_STYLE="single"
   
   # Copying necessary Yarn Workspace packages
   COPY --from=rollem-ui.switched.build /app/packages /app/packages
-  
-  # Focus on the workspace project we care about
-  RUN yarn workspaces focus @rollem/ui
+
   WORKDIR /app/packages/ui
   
   # Env setup
