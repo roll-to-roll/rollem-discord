@@ -42,6 +42,7 @@ module.exports = {
     config.ignoreWarnings.push(
       { message: /the request of a dependency is an expression/, }, // TypeORM spams these
       { message: /supports-color.*?a peer dependency/ }, // I blame TypeORM 
+      { message: /tried to access .*?\(a peer dependency\) but it isn't provided by its ancestors/ }, // Appears to be a Yarn Berry bug https://github.com/yarnpkg/berry/issues/5153
     );
 
     // Do not include .native which tries to load pg-native

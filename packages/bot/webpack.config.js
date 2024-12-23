@@ -9,6 +9,7 @@ const config = {
   ignoreWarnings: [
     { message: /the request of a dependency is an expression/, }, // TypeORM spams these
     { message: /supports-color.*?a peer dependency/ }, // I blame TypeORM 
+    { message: /tried to access .*?\(a peer dependency\) but it isn't provided by its ancestors/ }, // Appears to be a Yarn Berry bug https://github.com/yarnpkg/berry/issues/5153
   ],
   plugins: [
     // TODO: I'm not sure why all these are showing up here, since I thought they'd be already excluded from the dependencies list by the bundling?

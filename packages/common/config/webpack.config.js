@@ -12,6 +12,7 @@ module.exports = {
   },
   ignoreWarnings: [
     { message: /the request of a dependency is an expression/, }, // TypeORM spams these
+    { message: /tried to access .*?\(a peer dependency\) but it isn't provided by its ancestors/ }, // Appears to be a Yarn Berry bug https://github.com/yarnpkg/berry/issues/5153
   ],
   plugins: [
     new IgnorePlugin({ resourceRegExp: /^pg-native$/}), // typeorm peer dependency
