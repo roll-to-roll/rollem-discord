@@ -34,8 +34,7 @@
     "sass": "^1.79.4",
     "swr": "^2.2.5",
     "ts-loader": "^9.5.1",
-    "typescript": "^5.3.3",
-    "webpack-filter-warnings-plugin": "^1.2.1"
+    "typescript": "^5.3.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.5",

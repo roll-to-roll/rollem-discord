@@ -1,6 +1,5 @@
 const path = require('path')
 const { IgnorePlugin } = require('webpack');
-const FilterWarningsPlugin = require('webpack-filter-warnings-plugin');
 
 module.exports = {
   mode: 'production',
@@ -11,16 +10,39 @@ module.exports = {
     __filename: false,
     __dirname: false,
   },
+  ignoreWarnings: [
+    { message: /the request of a dependency is an expression/, }, // TypeORM spams these
+  ],
   plugins: [
-    new IgnorePlugin({ resourceRegExp: /^pg-native$/}),
-    new FilterWarningsPlugin({
-      exclude: [/hdb-pool/, /@sap\/hana-client/, /mongodb/, /mssql/, /mysql/, /mysql2/, /oracledb/, /pg/, /pg-query-stream/, /react-native-sqlite-storage/, /redis/, /sqlite3/, /sql.js/, /typeorm-aurora-data-api-driver/]
-    }),
-    // new CopyPlugin({
-    //   patterns: [
-    //     { from: "**/*", to: "" },
-    //   ],
-    // }),
+    // TODO: I'm not sure why all these are showing up here, since I thought they'd be already excluded from the dependencies list by the bundling?
+    new IgnorePlugin({ resourceRegExp: /^pg-native$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^react-native-sqlite-storage$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^mysql$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^mssql$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^sql.js$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^sqlite3$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^better-sqlite3$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^ioredis$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^redis$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^typeorm-aurora-data-api-driver$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^redis$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^pg-query-stream$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^oracledb$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^mysql2$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^hdb-pool$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^@sap\/hana-client$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^mongodb$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^@google-cloud\/spanner$/}), // typeorm peer dependency
+    new IgnorePlugin({ resourceRegExp: /^zlib-sync$/ }), // discord-ws dependency
+    new IgnorePlugin({ resourceRegExp: /^stack-chain$/, contextRegExp: /cls-hooked/ }), // cls-hooked dependency
+    new IgnorePlugin({ resourceRegExp: /^bufferutil$/ }), // ws peer dependency
+    new IgnorePlugin({ resourceRegExp: /^utf-8-validate$/ }), // ws peer dependency
+    new IgnorePlugin({ resourceRegExp: /^@azure\/opentelemetry-instrumentation-azure-sdk$/ }), // ws peer dependency
+    new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/instrumentation$/ }), // ???
+    new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/api$/ }), // ???
+    new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/sdk-trace-base$/ }), // ???
+    new IgnorePlugin({ resourceRegExp: /^@azure\/functions-core$/ }), // ???
+    new IgnorePlugin({ resourceRegExp: /^applicationinsights-native-metrics$/ }), // ???
   ],
   output: {
     path: path.resolve(__dirname, '../dist/umd'),

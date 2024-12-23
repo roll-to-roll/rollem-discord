@@ -49,7 +49,6 @@
     "watchify": "^3.9.0",
     "webpack": "^5.88.2",
     "webpack-cli": "^4.7.2",
-    "webpack-filter-warnings-plugin": "^1.2.1",
     "webpack-node-externals": "^3.0.0",
     "webpack-shell-plugin-next": "^2.2.2"
   },

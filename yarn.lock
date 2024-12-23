@@ -2303,7 +2303,6 @@ __metadata:
     watchify: "npm:^3.9.0"
     webpack: "npm:^5.88.2"
     webpack-cli: "npm:^4.7.2"
-    webpack-filter-warnings-plugin: "npm:^1.2.1"
     webpack-node-externals: "npm:^3.0.0"
     webpack-shell-plugin-next: "npm:^2.2.2"
   languageName: unknown
@@ -2363,7 +2362,6 @@ __metadata:
     watchify: "npm:^3.9.0"
     webpack: "npm:^5.88.2"
     webpack-cli: "npm:^4.7.2"
-    webpack-filter-warnings-plugin: "npm:^1.2.1"
   languageName: unknown
   linkType: soft
 
@@ -2423,7 +2421,6 @@ __metadata:
     watchify: "npm:^3.9.0"
     webpack: "npm:^5.88.2"
     webpack-cli: "npm:^4.7.2"
-    webpack-filter-warnings-plugin: "npm:^1.2.1"
     webpack-shell-plugin-next: "npm:^2.2.2"
   languageName: unknown
   linkType: soft
@@ -2487,7 +2484,6 @@ __metadata:
     watchify: "npm:^3.9.0"
     webpack: "npm:^5.88.2"
     webpack-cli: "npm:^4.7.2"
-    webpack-filter-warnings-plugin: "npm:^1.2.1"
     webpack-node-externals: "npm:^3.0.0"
     webpack-shell-plugin-next: "npm:^2.2.2"
   languageName: unknown
@@ -2540,7 +2536,6 @@ __metadata:
     ts-loader: "npm:^9.5.1"
     typescript: "npm:^5.3.3"
     webpack: "npm:^5.88.2"
-    webpack-filter-warnings-plugin: "npm:^1.2.1"
   languageName: unknown
   linkType: soft
 
@@ -20871,15 +20866,6 @@ __metadata:
   bin:
     webpack-cli: bin/cli.js
   checksum: 10c0/e144821a3eaf8c2598e80d6bc8b1b4035e6f5cb0046b3090ad0f858f87480f007127d5c5efa83c79436df3f31e0c0d6033fd9ea93526395984ef986ba5d72aa3
-  languageName: node
-  linkType: hard
-
-"webpack-filter-warnings-plugin@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "webpack-filter-warnings-plugin@npm:1.2.1"
-  peerDependencies:
-    webpack: ^2.0.0 || ^3.0.0 || ^4.0.0
-  checksum: 10c0/0a30b2b7725e4d4de96701d3a76b10d1e6a6e502a26e64177d8bcb1ba16a34dc87ab82f588b5b46620f105ac471c3b76e5f2810244b373efbdf6d3dc193553da
   languageName: node
   linkType: hard
 

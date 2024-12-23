@@ -36,8 +36,7 @@
     "tsconfig-paths": "^3.9.0",
     "typeorm": "^0.3.17",
     "typescript": "^5.3.3",
-    "watchify": "^3.9.0",
-    "webpack-filter-warnings-plugin": "^1.2.1"
+    "watchify": "^3.9.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^11.0.0",
