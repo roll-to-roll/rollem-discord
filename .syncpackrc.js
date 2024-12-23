@@ -18,6 +18,13 @@ const config = {
 
   versionGroups: [
     {
+      // default to lowest
+      "packages": ["**"],
+      "dependencies": ["**"],
+      "dependencyTypes": ["**"],
+      "preferVersion": "lowestSemver"
+    },
+    {
       // https://jamiemason.github.io/syncpack/examples/only-allow-types-in-dev-dependencies/
       dependencies: ["@types/**"],
       dependencyTypes: ["!dev"],
