@@ -20,8 +20,8 @@
     "sync:fix:all": "yarn run sync fix-mismatches",
     "setup-windows": "yarn exec ./scripts/setup.sh",
     "____________________workspaces (many)____________________": "multi-workspace commands. lower=sequential UPPER=PARALLEL",
-    "all": "yarn workspaces foreach --all --topological --exclude root",
-    "ALL": "yarn workspaces foreach --all --topological --parallel --exclude root",
+    "all": "yarn workspaces foreach --all --topological --exclude {root,resources/*}",
+    "ALL": "yarn workspaces foreach --all --topological --parallel --exclude {root,resources/*}",
     "BOTS": "yarn workspaces foreach --recursive --topological --parallel --from '{packages/bot,packages/mastodon}'",
     "UI": "yarn workspaces foreach --recursive --topological --parallel --from '{packages/ui}'",
     "BOT-DISCORD": "yarn workspaces foreach --recursive --topological --parallel --from packages/bot",
@@ -32,6 +32,8 @@
     "language": "yarn workspace @rollem/language",
     "ui": "yarn workspace @rollem/ui",
     "mastodon": "yarn workspace @rollem/mastodon",
+    "r/discord": "yarn workspace @rollem-resources/discord-single",
+    "r/discord-many": "yarn workspace @rollem-resources/discord-many",
     "____________________workspace aliases____________________": "workspace management shortcuts",
     "lang": "yarn language",
     "discord": "yarn bot",
@@ -113,6 +115,7 @@
     ":postpublish": "git push --tags"
   },
   "workspaces": [
-    "packages/*"
+    "packages/*",
+    "resources/*"
   ]
 }

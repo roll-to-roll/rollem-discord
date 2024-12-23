@@ -1,0 +1,10 @@
+services:
+
+  database:
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./.storage/data:/var/lib/postgresql/data
+    env_file:
+      - ../../secrets/docker.env

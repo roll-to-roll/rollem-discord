@@ -1537,6 +1537,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@rollem-resources/database@workspace:resources/database":
+  version: 0.0.0-use.local
+  resolution: "@rollem-resources/database@workspace:resources/database"
+  languageName: unknown
+  linkType: soft
+
+"@rollem-resources/discord-many@workspace:resources/discord-many":
+  version: 0.0.0-use.local
+  resolution: "@rollem-resources/discord-many@workspace:resources/discord-many"
+  languageName: unknown
+  linkType: soft
+
+"@rollem-resources/discord-single@workspace:resources/discord-single":
+  version: 0.0.0-use.local
+  resolution: "@rollem-resources/discord-single@workspace:resources/discord-single"
+  languageName: unknown
+  linkType: soft
+
 "@rollem/bot@workspace:packages/bot":
   version: 0.0.0-use.local
   resolution: "@rollem/bot@workspace:packages/bot"
