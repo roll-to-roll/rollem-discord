@@ -89,30 +89,45 @@ ARG BUILD_STYLE="single"
 ####################################################################################################
 
 ####################################################################################################
+# rollem-common.build: Builds ONLY @rollem/common -- the common package
+  FROM workspace.deps AS rollem-common.build
+  COPY packages/common /app/packages/common
+  RUN yarn common run build
+####################################################################################################
+
+####################################################################################################
+# rollem-language.build: Builds ONLY @rollem/language -- the language package
+  FROM workspace.deps AS rollem-language.build
+  COPY --from=rollem-common.build /app/packages/common/dist /app/packages/common/dist
+  COPY packages/language /app/packages/language
+  RUN yarn language run build
+####################################################################################################
+
+####################################################################################################
 # rollem-discord.build: Builds ONLY @rollem/bot -- the Discord bot
   FROM workspace.deps AS rollem-discord.build
+  COPY --from=rollem-common.build /app/packages/common/dist /app/packages/common/dist
+  COPY --from=rollem-language.build /app/packages/language/dist /app/packages/language/dist
   COPY packages/bot /app/packages/bot
-  COPY packages/common /app/packages/common
-  COPY packages/language /app/packages/language
-  RUN yarn docker:bot run build
+  RUN yarn bot run build
 ####################################################################################################
 
 ####################################################################################################
 # rollem-mastodon.build: Builds ONLY @rollem/mastodon -- the Mastodon bot
   FROM workspace.deps AS rollem-mastodon.build
+  COPY --from=rollem-common.build /app/packages/common/dist /app/packages/common/dist
+  COPY --from=rollem-language.build /app/packages/language/dist /app/packages/language/dist
   COPY packages/mastodon /app/packages/mastodon
-  COPY packages/common /app/packages/common
-  COPY packages/language /app/packages/language
-  RUN yarn docker:mastodon run build
+  RUN yarn mastodon run build
 ####################################################################################################
 
 ####################################################################################################
 # rollem-ui.build: Builds ONLY @rollem/ui -- the website
   FROM workspace.deps AS rollem-ui.build
+  COPY --from=rollem-common.build /app/packages/common/dist /app/packages/common/dist
+  COPY --from=rollem-language.build /app/packages/language/dist /app/packages/language/dist
   COPY packages/ui /app/packages/ui
-  COPY packages/common /app/packages/common
-  COPY packages/language /app/packages/language
-  RUN yarn docker:ui run build
+  RUN yarn ui run build
 ####################################################################################################
 
 ####################################################################################################
@@ -150,7 +165,7 @@ ARG BUILD_STYLE="single"
 ####################################################################################################
 
 ####################################################################################################
-# rollem-discord: Minimal container to run the (discord) bot
+# rollem-discord: Minimal container to run the discord bot
   FROM base AS rollem-discord
 
   # We'll be setting this up as a clone of our workspace, with /app/packages/specific-package containing what we need

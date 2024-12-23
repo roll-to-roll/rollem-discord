@@ -11,7 +11,7 @@ config.plugins.push(
   }),
   new WebpackShellPluginNext({
     onBuildStart: {
-      scripts: ['yarn run ::lang:build:pegjs'],
+      scripts: ['yarn run lang--build--pegjs'],
       blocking: true,
       parallel: false,
     },
