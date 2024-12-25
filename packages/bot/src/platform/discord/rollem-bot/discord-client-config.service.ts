@@ -1,4 +1,4 @@
-import { APIGatewayBotInfo, ClientOptions, IntentsBitField, Partials, SimpleIdentifyThrottler } from "discord.js";
+import { APIGatewayBotInfo, ClientOptions, IIdentifyThrottler, IntentsBitField, Options, Partials, SimpleIdentifyThrottler } from "discord.js";
 import { Injectable } from "injection-js";
 import { Config } from "./discord-config.service";
 import { IInitializeable } from "@common/util/injector-wrapper";
@@ -24,7 +24,7 @@ export class DiscordClientConfigService implements IInitializeable {
     
     this.botInfo = await fetchGatewayBotInfo(this.config.Token);
     this.grouping = groupShardsByRateLimitKey(this.botInfo, { forceShardCount: 176});
-    this.ourBucket = this.grouping.rateLimitBuckets[0];
+    this.ourBucket = this.grouping.noRateLimitBuckets[0];
   }
 
   /** Used by the client during construction. */
@@ -32,27 +32,77 @@ export class DiscordClientConfigService implements IInitializeable {
     return {
       shards: this.ourBucket?.shardIds ?? THROW(new RollemInitializerError({ message: "INITIALIZE SHARDS." })),
       shardCount: this.ourBucket?.totalShardCount ?? THROW(new RollemInitializerError({ message: "INITIALIZE." })),
-      partials: [ Partials.Channel ],
+
+      // TODO: Investigate full implications of partials
+      partials: [
+        Partials.Channel,
+        Partials.GuildScheduledEvent,
+        Partials.User,
+        Partials.Reaction,
+        Partials.ThreadMember,
+        Partials.GuildMember,
+        // Partials.Message, // this is the only one we actually need non-partial for
+      ],
+
+      // TODO: we can probably reduce this once we no longer need a deadman switch
       intents: [
-        IntentsBitField.Flags.Guilds,
+        // IntentsBitField.Flags.Guilds,
         // "GUILD_MEMBERS", // requires authorization and we don't need it
-        IntentsBitField.Flags.GuildBans,
-        IntentsBitField.Flags.GuildEmojisAndStickers,
-        IntentsBitField.Flags.GuildIntegrations,
-        IntentsBitField.Flags.GuildWebhooks,
-        IntentsBitField.Flags.GuildInvites,
-        IntentsBitField.Flags.GuildVoiceStates,
+        // IntentsBitField.Flags.GuildBans,
+        // IntentsBitField.Flags.GuildEmojisAndStickers,
+        // IntentsBitField.Flags.GuildIntegrations,
+        // IntentsBitField.Flags.GuildWebhooks,
+        // IntentsBitField.Flags.GuildInvites,
+        // IntentsBitField.Flags.GuildVoiceStates,
         IntentsBitField.Flags.MessageContent,
         // "GUILD_PRESENCES", // requires authorization and we don't need it
         IntentsBitField.Flags.GuildMessages,
-        IntentsBitField.Flags.GuildMessageReactions,
-        IntentsBitField.Flags.GuildMessageTyping,
+        // IntentsBitField.Flags.GuildMessageReactions,
+        // IntentsBitField.Flags.GuildMessageTyping,
         IntentsBitField.Flags.DirectMessages,
-        IntentsBitField.Flags.DirectMessageReactions,
-        IntentsBitField.Flags.DirectMessageTyping,
+        // IntentsBitField.Flags.DirectMessageReactions,
+        // IntentsBitField.Flags.DirectMessageTyping,
       ],
+
+      // See https://discordjs.guide/miscellaneous/cache-customization.html#limiting-caches
+      makeCache: Options.cacheWithLimits({
+        ...Options.DefaultMakeCacheSettings,
+        GuildMemberManager: {
+          maxSize: 0,
+          // keepOverLimit: member => member.id === member.client.user.id,
+        }, // we might need this for replies
+        GuildMessageManager: {maxSize: 0}, // we might need this for replies
+        GuildTextThreadManager: {maxSize: 0}, // we might need this for replies
+        MessageManager: {maxSize: 0}, // we might need this for replies
+        DMMessageManager: {maxSize: 0}, // we might need this for replies
+        GuildEmojiManager: {maxSize: 0}, // we might want this for reacts
+        UserManager: {maxSize: 0}, // we might need this for replies
+        ThreadManager: {maxSize: 0}, // we might need this for replies
+
+        // we should never need any of these
+        GuildBanManager: {maxSize: 0},
+        ApplicationCommandManager: {maxSize: 0},
+        AutoModerationRuleManager: {maxSize: 0},
+        BaseGuildEmojiManager: {maxSize: 0},
+        GuildForumThreadManager: {maxSize: 0},
+        GuildInviteManager: {maxSize: 0},
+        GuildScheduledEventManager: {maxSize: 0},
+        GuildStickerManager: {maxSize: 0},
+        PresenceManager: {maxSize: 0},
+        ReactionManager: {maxSize: 0},
+        ReactionUserManager: {maxSize: 0},
+        StageInstanceManager: {maxSize: 0},
+        ThreadMemberManager: {maxSize: 0},
+        VoiceStateManager: {maxSize: 0},
+      }),
+
       ws: {
-        buildIdentifyThrottler: _ => new SimpleIdentifyThrottler(this.botInfo?.session_start_limit.max_concurrency ?? THROW(new RollemInitializerError({ message: "INITIALIZE SHARDS." }))),
+        // no waiting. we have specifically selected shards to not share rate-limit-keys
+        buildIdentifyThrottler: async _ => Promise.resolve({
+          waitForIdentify(shardId, signal) {
+            return Promise.resolve();
+          }
+        })
       }
     };
   }

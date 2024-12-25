@@ -40,6 +40,9 @@ import { DiscordStats } from "@root/platform/discord/discord-stats";
 import { ClassProvider } from "injection-js";
 import { Status } from "discord.js";
 import pidusage from "pidusage";
+import { fetchGatewayBotInfo } from "@root/platform/discord/startup";
+import { humanizeInteger } from "@common/util/number-with-commas";
+import { humanizeMillisForDebug } from "@common/util/humanize-duration";
 
 const ORDERED_STANDARD_BEHAVIORS: Newable<BehaviorBase>[] = [
   PingPongBehavior,
@@ -90,7 +93,8 @@ async function doInit() {
       }),
     ...ORDERED_DISCORD_BEHAVIORS,
   ]).validateAllOrThrow()
-
+  
+  const config = intermediateDiscordScope.get(Config);
   const ourBucket = intermediateDiscordScope.get(DiscordClientConfigService).ourBucket;
   const client = intermediateDiscordScope.get(DiscordClientService).client;
   
@@ -100,8 +104,8 @@ async function doInit() {
 
   /** Dump Memory Usage */
   async function printUsage(): Promise<void> {
-    const parentUsageBytes = process.memoryUsage.rss()
-    const parentPidUsageBytes = await pidusage(process.pid)
+    const memoryUsage = process.memoryUsage();
+    memoryUsage
     const memFactor = 1024*1024;
     const memUnit = 'MB'
   
@@ -109,13 +113,23 @@ async function doInit() {
     console.debug("###########################");
     console.debug("## Memory v Shard Status ##");
     console.debug("###########################");
-    console.debug("      ", parentPidUsageBytes.memory/memFactor, `${memUnit}\t(Process via pid)`)
-    console.debug("      ", parentUsageBytes/memFactor, `${memUnit}\t(Process via rss)`) 
+    console.debug("      ", Math.floor(memoryUsage.rss/memFactor),          `${memUnit}\t(Process via rss)`);
+    console.debug("      ", Math.floor(memoryUsage.heapUsed/memFactor),     `${memUnit}\t(Heap Used)`);
+    console.debug("      ", Math.floor(memoryUsage.heapTotal/memFactor),    `${memUnit}\t(Heap Total)`);
+    console.debug("      ", Math.floor(memoryUsage.external/memFactor),     `${memUnit}\t(External)`);
+    console.debug("      ", Math.floor(memoryUsage.arrayBuffers/memFactor), `${memUnit}\t(Array Buffers)`);
     client.ws.shards.forEach(shard => {
       shard.ping
       console.debug("Shard:", Status[shard.status], "With ping", shard.ping, "at", new Date(shard.lastPingTimestamp), `(Shard = ${shard.id} of ${ourBucket?.totalShardCount})`);
     });
     console.debug("###########################");
+    const botInfo = await fetchGatewayBotInfo(config.Token);
+    const limit = botInfo.session_start_limit;
+    console.debug("Auths Remaining: ", humanizeInteger(limit.remaining), "/", humanizeInteger(limit.total), " ≈ ", Math.floor(limit.remaining/limit.total*10000)/100, "%");
+    console.debug("      Resets in: ", ...humanizeMillisForDebug(limit.reset_after));
+    console.debug("###########################");
+    console.debug("###########################");
+  
   }
 }
 

@@ -2,6 +2,7 @@ import { RollemConfigError } from "@common/errors";
 import { humanizeMillisForDebug } from "@common/util/humanize-duration";
 import { humanizeInteger } from "@common/util/number-with-commas";
 import { APIGatewayBotInfo } from "discord.js";
+import { chunk } from "lodash";
 import moment from "moment";
 
 /** Information about a single Rollem Shard Bucket. */
@@ -46,6 +47,9 @@ export interface ShardGroupings {
 
   /** The ultimate bucketing arrived at. */
   rateLimitBuckets: Record<number, ShardRateLimitBucket>
+
+  /** Sets of shards which may be started concurrently. */
+  noRateLimitBuckets: ShardRateLimitBucket[];
 }
 
 /** Options configuring @see groupShardsByRateLimitKey */
@@ -109,9 +113,21 @@ export function groupShardsByRateLimitKey(botInfo: APIGatewayBotInfo, options: S
     rateLimitBucket.groupShardCount++;
   }
 
+  const noRateLimitBuckets: ShardRateLimitBucket[]
+    = chunk([...Array(targetShardsCount).keys()], limit.max_concurrency)
+      .map(v => {
+        return {
+          groupShardCount: v.length,
+          rateLimitKey: -1,
+          shardIds: v,
+          totalShardCount: targetShardsCount,
+        }
+      });
+
   return {
     botInfo,
     rateLimitBuckets,
+    noRateLimitBuckets,
     bounds: {
       guildCount: { upper: guildCountUpperBound, lower: guildCountLowerBound },
       minShards: { upper: minShardsUpperBound, lower: minShardsLowerBound },

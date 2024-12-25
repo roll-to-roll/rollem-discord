@@ -18,8 +18,8 @@ export class DiscordClientService implements IInitializeable {
   ) {
     const options = this.clientConfig.clientOptions;
     logger.trackSimpleEvent(LoggerCategory.SystemEvent, "Constructing client...");
-    logger.trackSimpleEvent(LoggerCategory.SystemEvent, `Shard IDs: ${options.shards}`)
-    logger.trackSimpleEvent(LoggerCategory.SystemEvent, "Shard Count: " + options.shardCount)
+    logger.trackSimpleEvent(LoggerCategory.SystemEvent, `Shard IDs: ${options.shards}`);
+    logger.trackSimpleEvent(LoggerCategory.SystemEvent, "Shard Count: " + options.shardCount);
     // logger.trackSimpleEvent(LoggerCategory.SystemEvent, "Logging in using token: " + config.Token);
 
     console.debug("ClientOptions", options);
@@ -27,6 +27,7 @@ export class DiscordClientService implements IInitializeable {
   }
 
   public async initialize(): Promise<void> {
+    this.client.on('debug', m => console.debug(m));
     await this.client.login(this.envConfig.Token);
   }
 }
