@@ -72,7 +72,7 @@
         "src/common/*"
       ],
       "@bot/*": [
-        "src/discord/rollem-bot/*"
+        "src/platform/discord/rollem-bot/*"
       ],
       "@root/*": [
         "src/*"

@@ -4,6 +4,6 @@ import nodeFetch from 'node-fetch';
 import util from 'util';
 global.fetch = nodeFetch as any;
 
-import { bootstrapShardedBot } from "@bot/bot-sharded";
+import { bootstrapShardedBot } from "@root/platform/discord/rollem-bot/bot-sharded";
 
 bootstrapShardedBot();
