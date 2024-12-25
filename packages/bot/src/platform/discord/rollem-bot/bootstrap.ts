@@ -1,28 +1,28 @@
 // Logger2 and App imports should stay at the top, as they start the metrics early.
-import { PromLogger } from "../../../common/prom-logger";
-import { App } from "./app";
+import { PromLogger } from "../../../common/services/prom-logger.service/prom-logger.service";
+import { App } from "../../../common/services/prom-logger.service/prom-logger-api.servic";
 
-import { Logger, LoggerCategory } from "./logger";
+import { Logger, LoggerCategory } from "../../../common/services/logger.service/logger.service";
 
-import { Config } from "./config";
+import { Config } from "./discord-config.service";
 
-import { Parsers } from "@root/platform/discord/rollem-bot/lib/parsers";
+import { Parsers } from "@common/services/parsers.service";
 
 import { BitFieldResolvable, Client, ClientOptions, GatewayIntentBits, GatewayIntentsString, IntentsBitField, Partials } from "discord.js";
-import { ChangeLog } from "./changelog";
-import { DiscordBehaviorBase } from "./behaviors/discord-behavior-base";
+import { ChangeLog } from "../../../common/services/changelog/changelog";
+import { DiscordBehaviorBase } from "./behaviors/discord.behavior.base";
 // import assert from "assert";
-import { InjectorWrapper } from "./lib/injector-wrapper";
-import { Newable } from "./lib/utility-types";
-import { RepliedMessageCache } from "./lib/replied-message-cache";
+import { InjectorWrapper, RollemProvider } from "../../../common/util/injector-wrapper";
+import { Newable } from "../../../common/util/types/utility-types";
+import { RepliedMessageCache } from "./lib/replied-message-cache.service";
 import { Storage } from "@rollem/common";
 import { BehaviorBase } from "@common/standard-behaviors/behavior.base";
 import { ClassProvider, Provider } from "injection-js";
-import { BehaviorStatsBase } from "@common/standard-behaviors/stats-base";
+import { BehaviorStatsBase } from "@common/standard-behaviors/stat.behavior.base";
 import { DiscordStats } from "../discord-stats";
 import { strict } from "assert";
 import { RollemParserV1, RollemParserV1Beta, RollemParserV2 } from "@rollem/language";
-import { RollemRandomSources } from "./lib/rollem-random-sources";
+import { RollemRandomSources } from "./lib/rollem-random-sources.service";
 import { defaults } from "lodash";
 
 // tslint:disable-next-line: no-namespace
@@ -33,7 +33,7 @@ export namespace Bootstrapper {
     options = defaults({}, options, { skipPromEndpoints: false })!;
     // tslint:disable-next-line: no-console
     console.log("Setting up top-level DI");
-    const providers: Provider[] = 
+    const providers: RollemProvider[] = 
     [
       PromLogger,
       Logger,

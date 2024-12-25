@@ -1,11 +1,11 @@
-import { DiscordBehaviorBase } from "./discord-behavior-base";
+import { DiscordBehaviorBase } from "./discord.behavior.base";
 import { ActivityType, Client } from "discord.js";
-import { Logger, LoggerCategory } from "@root/platform/discord/rollem-bot/logger";
-import { Config } from "@root/platform/discord/rollem-bot/config";
-import { ChangeLog } from "@root/platform/discord/rollem-bot/changelog";
+import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
+import { Config } from "@bot/discord-config.service";
+import { ChangeLog } from "@common/services/changelog/changelog";
 import moment from "moment";
 import { Injectable } from "injection-js";
-import { PromLogger } from "@common/prom-logger";
+import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 
 /**
  * Initializes the system after login and starts the heartbeat.

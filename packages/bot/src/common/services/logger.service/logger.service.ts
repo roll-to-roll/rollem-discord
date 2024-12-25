@@ -1,8 +1,8 @@
 // enable application insights if we have an instrumentation key set up
 import * as appInsights from "applicationinsights";
 import { Client, Message } from "discord.js";
-import { Config } from "./config";
-import { ChangeLog } from "./changelog";
+import { Config } from "../../../platform/discord/rollem-bot/discord-config.service";
+import { ChangeLog } from "../changelog/changelog";
 import util from "util";
 import { Injectable } from "injection-js";
 

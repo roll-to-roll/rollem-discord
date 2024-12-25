@@ -1,8 +1,8 @@
 import { ParserVersion } from '@common/standard-behaviors/types/behavior-context';
 import { Injectable } from 'injection-js';
 import * as client from 'prom-client';
-import { ChangeLog } from '../platform/discord/rollem-bot/changelog';
-import { Config } from '../platform/discord/rollem-bot/config';
+import { ChangeLog } from '../changelog/changelog';
+import { Config } from '../../../platform/discord/rollem-bot/discord-config.service';
 
 export enum HandlerType {
   Roll = 'roll',

@@ -4,7 +4,7 @@ import nodeFetch from 'node-fetch';
 import util from 'util';
 global.fetch = nodeFetch as any;
 
-import { Config } from "@root/platform/discord/rollem-bot/config";
+import { Config } from "@bot/discord-config.service";
 import { fetchGatewayBotInfo, groupShardsByRateLimitKey } from "./platform/discord/startup";
 import pidusage from "pidusage";
 import { bootstrapShardedBotInternal } from "@root/platform/discord/rollem-bot/bot-sharded-internal";

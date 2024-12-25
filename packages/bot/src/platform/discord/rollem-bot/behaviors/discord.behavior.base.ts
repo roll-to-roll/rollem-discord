@@ -1,7 +1,7 @@
 import { Client } from "discord.js";
-import { Logger, LoggerCategory } from "@root/platform/discord/rollem-bot/logger";
+import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { Injectable } from "injection-js";
-import { PromLogger } from "@common/prom-logger";
+import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 
 /** A base for behaviors to be applied to a discord client. */
 @Injectable()

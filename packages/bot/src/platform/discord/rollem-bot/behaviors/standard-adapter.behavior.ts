@@ -1,14 +1,14 @@
 import { Client, Message } from "discord.js";
-import { Logger, LoggerCategory } from "@root/platform/discord/rollem-bot/logger";
+import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { Inject, Injectable } from "injection-js";
 import { BehaviorBase } from "@common/standard-behaviors/behavior.base";
-import { Config } from "../config";
-import { RepliedMessageCache } from "../lib/replied-message-cache";
+import { Config } from "../discord-config.service";
+import { RepliedMessageCache } from "../lib/replied-message-cache.service";
 import { BehaviorContext, DatabaseFailure, ParserVersion, PrefixStyle } from "@common/standard-behaviors/types/behavior-context";
 import { Storage, User } from "@rollem/common";
-import { DiscordBehaviorBase } from './discord-behavior-base';
+import { DiscordBehaviorBase } from './discord.behavior.base';
 import { BehaviorResponse } from "@common/standard-behaviors/types/behavior-response";
-import { PromLogger } from "@common/prom-logger";
+import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 
 /** A base for behaviors to be applied to a discord client. */
 @Injectable()
@@ -24,6 +24,7 @@ export class StandardAdapter extends DiscordBehaviorBase {
   ) {
     super(client, promLogger, logger);
   }
+  
   /** Applies the behavior to the given client. */
   public async apply(): Promise<void> {
     let behaviorNames = this.behaviors.map(b => b.constructor.name);

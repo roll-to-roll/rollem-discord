@@ -1,6 +1,6 @@
-import { ChangeLog } from "@root/platform/discord/rollem-bot/changelog";
-import { Logger } from "@root/platform/discord/rollem-bot/logger";
-import { HandlerType, PromLogger } from "@common/prom-logger";
+import { ChangeLog } from "@common/services/changelog/changelog";
+import { Logger } from "@common/services/logger.service/logger.service";
+import { HandlerType, PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { BehaviorContext } from "@common/standard-behaviors/types/behavior-context";
 import { BehaviorResponse } from "@common/standard-behaviors/types/behavior-response";
 import { BehaviorBase, Trigger } from "@common/standard-behaviors/behavior.base";

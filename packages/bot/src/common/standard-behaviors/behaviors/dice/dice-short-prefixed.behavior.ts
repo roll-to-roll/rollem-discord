@@ -1,8 +1,8 @@
-import { Config } from "@root/platform/discord/rollem-bot/config";
-import { Parsers } from "@root/platform/discord/rollem-bot/lib/parsers";
-import { RollemRandomSources } from "@root/platform/discord/rollem-bot/lib/rollem-random-sources";
-import { Logger } from "@root/platform/discord/rollem-bot/logger";
-import { HandlerType, PromLogger, RollHandlerSubtype } from "@common/prom-logger";
+import { Config } from "@bot/discord-config.service";
+import { Parsers } from "@common/services/parsers.service";
+import { RollemRandomSources } from "@bot/lib/rollem-random-sources.service";
+import { Logger } from "@common/services/logger.service/logger.service";
+import { HandlerType, PromLogger, RollHandlerSubtype } from "@common/services/prom-logger.service/prom-logger.service";
 import { BehaviorContext } from "@common/standard-behaviors/types/behavior-context";
 import { BehaviorResponse } from "@common/standard-behaviors/types/behavior-response";
 import { Trigger } from "@common/standard-behaviors/behavior.base";

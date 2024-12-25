@@ -1,10 +1,10 @@
-import { DiscordBehaviorBase } from "./discord-behavior-base";
+import { DiscordBehaviorBase } from "./discord.behavior.base";
 import util, { promisify } from "util";
 import { Client, Message, User, MessageReaction } from "discord.js";
-import { Logger, LoggerCategory } from "@root/platform/discord/rollem-bot/logger";
+import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { Injectable } from "injection-js";
-import { PromLogger } from "@common/prom-logger";
-import { Config } from "@root/platform/discord/rollem-bot/config";
+import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
+import { Config } from "@bot/discord-config.service";
 
 // TODO: there's got to be a cleaner way to handle this, but this seems to make it more resilient.
 

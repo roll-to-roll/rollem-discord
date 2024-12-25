@@ -1,6 +1,6 @@
 import fs from 'fs';
 import util from 'util';
-import { Logger, LoggerCategory } from './logger';
+import { Logger, LoggerCategory } from '../logger.service/logger.service';
 import { Injectable } from 'injection-js';
 import packageInfo from '../../../../package.json';
 

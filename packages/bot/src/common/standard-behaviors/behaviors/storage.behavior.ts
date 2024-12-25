@@ -1,5 +1,5 @@
-import { Logger } from "@root/platform/discord/rollem-bot/logger";
-import { HandlerType, PromLogger, StorageHandlerSubtype } from "@common/prom-logger";
+import { Logger } from "@common/services/logger.service/logger.service";
+import { HandlerType, PromLogger, StorageHandlerSubtype } from "@common/services/prom-logger.service/prom-logger.service";
 import { BehaviorContext, isDatabaseFailure } from "@common/standard-behaviors/types/behavior-context";
 import { BehaviorResponse } from "@common/standard-behaviors/types/behavior-response";
 import { BehaviorBase, Trigger } from "@common/standard-behaviors/behavior.base";

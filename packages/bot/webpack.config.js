@@ -73,7 +73,7 @@ const config = {
   resolve: {
     extensions: [".tsx", ".ts", ".js", ".pegjs"],
     alias: {
-      "@bot": path.resolve(__dirname, "src/discord/rollem-bot/"),
+      "@bot": path.resolve(__dirname, "src/platform/discord/rollem-bot/"),
       "@common": path.resolve(__dirname, "src/common/"),
       "@root": path.resolve(__dirname, "src/"),
     },

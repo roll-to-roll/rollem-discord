@@ -1,6 +1,6 @@
-import { Logger } from "@root/platform/discord/rollem-bot/logger";
-import { PromLogger } from "@common/prom-logger";
-import { BehaviorStatsBase, BotStats } from "@common/standard-behaviors/stats-base";
+import { Logger } from "@common/services/logger.service/logger.service";
+import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
+import { BehaviorStatsBase, BotStats } from "@common/standard-behaviors/stat.behavior.base";
 import { Client } from "discord.js";
 import { Injectable } from "injection-js";
 import moment from "moment";

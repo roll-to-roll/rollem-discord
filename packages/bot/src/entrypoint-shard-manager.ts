@@ -5,7 +5,7 @@ import util from 'util';
 global.fetch = nodeFetch as any;
 
 import { ShardingManager, ShardingManagerOptions } from "discord.js";
-import { Config } from "@root/platform/discord/rollem-bot/config";
+import { Config } from "@bot/discord-config.service";
 import { fetchGatewayBotInfo, groupShardsByRateLimitKey } from "./platform/discord/startup";
 import { env } from "process";
 import pidusage from "pidusage";

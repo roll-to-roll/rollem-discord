@@ -1,6 +1,6 @@
 import express from 'express';
 import * as client from 'prom-client';
-import { Config } from './config';
+import { Config } from '../../../platform/discord/rollem-bot/discord-config.service';
 import { Server } from 'http';
 
 const app = express();

@@ -1,5 +1,5 @@
-import { Logger } from "@root/platform/discord/rollem-bot/logger";
-import { PromLogger } from "@common/prom-logger";
+import { Logger } from "@common/services/logger.service/logger.service";
+import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { Message } from "discord.js";
 import { Injectable, InjectionToken } from "injection-js";
 import { BehaviorContext } from "./types/behavior-context";

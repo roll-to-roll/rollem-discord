@@ -3,14 +3,14 @@ import "reflect-metadata";
 import nodeFetch from 'node-fetch';
 global.fetch = nodeFetch as any;
 
-import { Newable } from "./lib/utility-types";
-import { DiscordBehaviorBase } from "./behaviors/discord-behavior-base";
+import { Newable } from "../../../common/util/types/utility-types";
+import { DiscordBehaviorBase } from "./behaviors/discord.behavior.base";
 import { DeadmanSwitchBehavior } from "./behaviors/deadman-switch";
 import { DieOnDisconnectBehavior } from "./behaviors/die-on-disconnect.behavior";
 import { DieOnErrorBehavior } from "./behaviors/die-on-error.behavior";
-import { HeartbeatBehavior } from "./behaviors/heartbeat.behavior";
+import { HeartbeatBehavior } from "./behaviors/heartbeat.behavior.behavior";
 import { Bootstrapper } from "./bootstrap";
-import { StandardAdapter } from "./behaviors/standard-adapter";
+import { StandardAdapter } from "./behaviors/standard-adapter.behavior";
 import { BehaviorBase } from "@common/standard-behaviors/behavior.base";
 import { PingPongBehavior } from "@common/standard-behaviors/behaviors/ping-pong.behavior";
 import { StatsBehavior } from "@common/standard-behaviors/behaviors/stats.behavior";
@@ -20,7 +20,7 @@ import { DiceShortPrefixedBehavior } from "@common/standard-behaviors/behaviors/
 import { DiceSoftParseBehavior } from "@common/standard-behaviors/behaviors/dice/dice-soft-parse.behavior";
 import { DiceTaggedBehavior } from "@common/standard-behaviors/behaviors/dice/dice-tagged.behavior";
 import { StorageBehavior } from "@common/standard-behaviors/behaviors/storage.behavior";
-import { EventMonitorBehavior } from "./behaviors/event-monitor";
+import { EventMonitorBehavior } from "./behaviors/event-monitor.behavior";
 import { Client, ClientOptions } from "discord.js";
 
 const ORDERED_STANDARD_BEHAVIORS: Newable<BehaviorBase>[] = [
