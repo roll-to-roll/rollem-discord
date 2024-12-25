@@ -108,7 +108,7 @@ export namespace Bootstrapper {
   }
 
   /** Creates the client and hooks it up to the logger. */
-  export function prepareClient(topLevelInjector: InjectorWrapper) {
+  export function prepareClient(topLevelInjector: InjectorWrapper, clientOptionsTweaks?: Partial<ClientOptions>) {
     const logger = topLevelInjector.get(Logger);
     const config = topLevelInjector.get(Config);
 
@@ -138,7 +138,7 @@ export namespace Bootstrapper {
 
     const partials: Partials[] = [ Partials.Channel ];
 
-    const clientOptions: ClientOptions =
+    const clientOptionsDefaults = 
       config.HasShardInfo
       ? {
         intents,
@@ -146,6 +146,8 @@ export namespace Bootstrapper {
         shardCount: config.ShardCount,
         shards: config.ShardId}
       : { intents, partials };
+
+    const clientOptions: ClientOptions = defaults({}, clientOptionsTweaks, clientOptionsDefaults);
     const client = new Client(clientOptions);
     logger.client = client;
 
