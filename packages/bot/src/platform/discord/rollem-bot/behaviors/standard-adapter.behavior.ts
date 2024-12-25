@@ -9,12 +9,13 @@ import { Storage, User } from "@rollem/common";
 import { DiscordBehaviorBase } from './discord.behavior.base';
 import { BehaviorResponse } from "@common/standard-behaviors/types/behavior-response";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
+import { DiscordClientService } from "@bot/discord-client.service";
 
 /** A base for behaviors to be applied to a discord client. */
 @Injectable()
 export class StandardAdapter extends DiscordBehaviorBase {
   constructor(
-    client: Client,
+    client: DiscordClientService,
     promLogger: PromLogger,
     logger: Logger,
     private readonly config: Config,

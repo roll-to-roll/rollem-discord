@@ -1,13 +1,20 @@
 import { Client } from "discord.js";
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
-import { Injectable } from "injection-js";
+import { ClassProvider, Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
+import { Newable } from "@common/util/types/utility-types";
+import { DiscordClientService } from "@bot/discord-client.service";
+import { IInitializeable } from "@common/util/injector-wrapper";
 
 /** A base for behaviors to be applied to a discord client. */
 @Injectable()
-export abstract class DiscordBehaviorBase {
+export abstract class DiscordBehaviorBase implements IInitializeable {
+  public static asBehavior<T extends DiscordBehaviorBase>(this: Newable<T>): ClassProvider { return { provide: DiscordBehaviorBase, useClass: this, multi: true }; }
+  
+  protected get client(): Client { return this.clientService.client; }
+  
   constructor(
-    protected readonly client: Client,
+    protected readonly clientService: DiscordClientService,
     protected readonly promLogger: PromLogger,
     protected readonly logger: Logger,
   ) { }
@@ -20,6 +27,10 @@ export abstract class DiscordBehaviorBase {
 
   /** Called on initialization to register any callbacks with the discord client. */
   protected abstract register(): Promise<void>;
+
+  public initialize(): Promise<void> {
+    return this.apply();
+  }
 
   /** Handle an unknown rejection. */
   protected handleRejection(label: string, error: Error) {

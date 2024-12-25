@@ -1,3 +1,4 @@
+import { DiscordClientService } from "@bot/discord-client.service";
 import { Logger } from "@common/services/logger.service/logger.service";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { BehaviorStatsBase, BotStats } from "@common/standard-behaviors/stat.behavior.base";
@@ -22,10 +23,12 @@ export class DiscordStats extends BehaviorStatsBase {
   private readonly botUserCountByServerGauge: Gauge;
   private readonly realUserCountByServerGauge: Gauge;
 
+  private get client(): Client { return this.clientService.client; }
+
   constructor(
     private readonly logger: Logger,
     private readonly promLogger: PromLogger,
-    private readonly client: Client,
+    private readonly clientService: DiscordClientService,
   ) {
     super();
     const self = this;

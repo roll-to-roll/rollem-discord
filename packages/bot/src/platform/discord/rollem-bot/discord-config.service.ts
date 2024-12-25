@@ -1,8 +1,9 @@
+import { IInitializeable } from "@common/util/injector-wrapper";
 import { Injectable } from "injection-js";
 
 /** Loads and stores various configuration values. */
 @Injectable()
-export class Config {
+export class Config implements IInitializeable {
   /** The ID of this shard. Must be below @see ShardCount. */
   public readonly ShardId = process.env.DISCORD_BOT_SHARD_ID ? +process.env.DISCORD_BOT_SHARD_ID : undefined;
 
@@ -11,6 +12,10 @@ export class Config {
 
   /** True if the config has all needed shard info. */
   public readonly HasShardInfo = this.ShardId != undefined && this.ShardCount != undefined;
+
+  public initialize(): Promise<void> {
+    return Promise.resolve();
+  }
 
   /** Gets a machine-ready shard label. */
   public get ShardLabel(): string {

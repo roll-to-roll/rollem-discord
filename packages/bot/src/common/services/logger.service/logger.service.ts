@@ -2,7 +2,6 @@
 import * as appInsights from "applicationinsights";
 import { Client, Message } from "discord.js";
 import { Config } from "../../../platform/discord/rollem-bot/discord-config.service";
-import { ChangeLog } from "../changelog/changelog";
 import util from "util";
 import { Injectable } from "injection-js";
 
@@ -20,12 +19,6 @@ const ignoredCategories: LoggerCategory[] = []
 @Injectable()
 export class Logger {
   private readonly aiClient?: appInsights.TelemetryClient;
-
-  /** The client this logger is for. */
-  public client?: Client;
-
-  /** The associated changelog. */
-  public changelog?: ChangeLog;
 
   constructor(
     /** The associated config. */
@@ -158,8 +151,6 @@ export class Logger {
 
   /** Constructs a borg-readable string identifying this shard. Like "7 of 9" */
   public shardName() {
-    if (!this.client) { return undefined; }
-
     var shardId = this.shardId();
     var shardCount = this.shardCount();
     
@@ -171,8 +162,6 @@ export class Logger {
 
   /** Constructs a one-index string identifying this shard. */
   public shardId() {
-    if (!this.client) { return undefined; }
-    if (this.client.shard) { return this.client.shard.ids.map(id => id + 1).join(", "); }
     if (this.config.HasShardInfo && typeof this.config.ShardId == "number") {
       return this.config.ShardId + 1;
     }
@@ -182,8 +171,6 @@ export class Logger {
 
   /** Safely retrieves the shard count. */
   public shardCount() {
-    if (!this.client) { return undefined; }
-    if (this.client.shard) { return this.client.shard.count; }
     if (this.config.HasShardInfo) {
       return this.config.ShardCount;
     }
@@ -193,32 +180,32 @@ export class Logger {
 
   /** Adds common AI properties to the given object (or creates one). Returns the given object. */
   private enrichAIProperties(message: Message|null, object = {}) {
-    if (this.client && this.client.user) {
+    // if (this.client && this.client.user) {
       object['Guild ID'] = '' + (message?.guild?.id ?? 'none');
       object['Author ID'] = '' + (message?.author?.id ?? 'none');
       object['Channel ID'] = '' + (message?.channel?.id ?? 'none');
       object["Message ID"] = '' + (message?.id ?? '');
       object["Shard Name"] = '' + this.shardName();
-      object["Client ID"] = '' + this.client.user.id;
-      object["Client Name"] = '' + this.client.user.username;
-    }
+      // object["Client ID"] = '' + this.client.user.id;
+      // object["Client Name"] = '' + this.client.user.username;
+    // }
     
-    if (this.changelog) {
-      object["Version"] = '' + this.changelog.version;
-    }
+    // if (this.changelog) {
+    //   object["Version"] = '' + this.changelog.version;
+    // }
 
     return object;
   }
 
   /** Adds common AI metrics to the given object (or creates one). Returns the given object. */
   private enrichAIMetrics(message: Message|null, object = {}) {
-    if (this.client) {
-      object['Servers (per shard)'] = this.client.guilds.cache.size;
-      object['Users (per shard)'] = this.client.users.cache.size;
-      object['Uptime (minutes)'] = (this.client.uptime || 0) / 1000 / 60;
+    // if (this.client) {
+    //   object['Servers (per shard)'] = this.client.guilds.cache.size;
+    //   object['Users (per shard)'] = this.client.users.cache.size;
+    //   object['Uptime (minutes)'] = (this.client.uptime || 0) / 1000 / 60;
       object['Shard Count'] = this.shardCount();
       object['Shard ID'] = this.shardId();
-    }
+    // }
 
     return object;
   }

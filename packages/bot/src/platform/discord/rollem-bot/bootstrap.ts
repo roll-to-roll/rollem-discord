@@ -1,6 +1,6 @@
 // Logger2 and App imports should stay at the top, as they start the metrics early.
 import { PromLogger } from "../../../common/services/prom-logger.service/prom-logger.service";
-import { App } from "../../../common/services/prom-logger.service/prom-logger-api.servic";
+import { PromLoggerApi } from "../../../common/services/prom-logger.service/prom-logger-api.servic";
 
 import { Logger, LoggerCategory } from "../../../common/services/logger.service/logger.service";
 
@@ -49,7 +49,7 @@ export namespace Bootstrapper {
     ];
 
     if (!options.skipPromEndpoints)
-      providers.push(App);
+      providers.push(PromLoggerApi);
 
     const topLevelInjector =
       InjectorWrapper.createTopLevelContext(providers);
@@ -57,7 +57,7 @@ export namespace Bootstrapper {
     const promLogger = topLevelInjector.get(PromLogger);
     strict(!!promLogger, "DI failed to resolve promLogger (prometheus)");
     if (!options.skipPromEndpoints) {
-      const app = topLevelInjector.get(App);
+      const app = topLevelInjector.get(PromLoggerApi);
       strict(!!app, "DI failed to resolve app (express api)");
     }
     const logger = topLevelInjector.get(Logger);
@@ -97,7 +97,7 @@ export namespace Bootstrapper {
     topLevelInjector.get(ChangeLog)
       .initialize()
       .then(changelog => {
-        logger.changelog = changelog;
+        // logger.changelog = changelog;
         logger.trackSimpleEvent(
           LoggerCategory.SystemEvent,
           `Got changelog ${changelog.changelog}`,
@@ -149,7 +149,6 @@ export namespace Bootstrapper {
 
     const clientOptions: ClientOptions = defaults({}, clientOptionsTweaks, clientOptionsDefaults);
     const client = new Client(clientOptions);
-    logger.client = client;
 
     return client;
   }

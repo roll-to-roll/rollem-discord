@@ -4,6 +4,7 @@ import { Client } from "discord.js";
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
+import { DiscordClientService } from "@bot/discord-client.service";
 
 // TODO: there's got to be a cleaner way to handle this, but this seems to make it more resilient.
 
@@ -14,10 +15,10 @@ import { PromLogger } from "@common/services/prom-logger.service/prom-logger.ser
 @Injectable()
 export class DieOnErrorBehavior extends DiscordBehaviorBase {
   constructor(
-    client: Client,
+    clientService: DiscordClientService,
     promLogger: PromLogger,
     logger: Logger,
-  ) { super(client, promLogger, logger); }
+  ) { super(clientService, promLogger, logger); }
   
   protected async register() {
     this.client.on('error', error => this.handleClientError(error));

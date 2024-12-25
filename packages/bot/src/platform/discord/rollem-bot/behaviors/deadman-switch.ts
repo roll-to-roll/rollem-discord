@@ -5,6 +5,7 @@ import { Logger, LoggerCategory } from "@common/services/logger.service/logger.s
 import { Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { Config } from "@bot/discord-config.service";
+import { DiscordClientService } from "@bot/discord-client.service";
 
 // TODO: there's got to be a cleaner way to handle this, but this seems to make it more resilient.
 
@@ -18,7 +19,7 @@ export class DeadmanSwitchBehavior extends DiscordBehaviorBase {
   private static readonly PollingDuration = 30 * 1000;
 
   constructor(
-    client: Client,
+    client: DiscordClientService,
     promLogger: PromLogger,
     logger: Logger,
     private readonly config: Config

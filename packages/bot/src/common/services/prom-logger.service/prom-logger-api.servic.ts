@@ -31,7 +31,7 @@ app.get('/', async (req, res) => {
 const server: Server | undefined = undefined;; 
 
 /** The express app. */
-export class App {
+export class PromLoggerApi {
   private readonly app = app;
 
   constructor() {

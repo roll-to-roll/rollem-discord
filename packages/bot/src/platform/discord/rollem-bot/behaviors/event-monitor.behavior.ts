@@ -4,6 +4,7 @@ import { Client, Message, User, MessageReaction, ClientEvents } from "discord.js
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
+import { DiscordClientService } from "@bot/discord-client.service";
 
 interface AdditionalMetrics {
   guildId?: string;
@@ -17,7 +18,7 @@ interface AdditionalMetrics {
 export class EventMonitorBehavior extends DiscordBehaviorBase {
   userCountGauge: any;
   constructor(
-    client: Client,
+    client: DiscordClientService,
     promLogger: PromLogger,
     logger: Logger,
   ) { super(client, promLogger, logger); }
