@@ -7,6 +7,7 @@
   "dependencies": {
     "@rollem/common": "workspace:*",
     "@rollem/language": "workspace:*",
+    "@types/pidusage": "^2.0.5",
     "applicationinsights": "^2.9.1",
     "chai": "^3.5.0",
     "chance": "^1.1.5",
@@ -33,6 +34,7 @@
     "pegjs": "0.10.0",
     "pegjs-loader": "^0.5.6",
     "pg": "^8.6.0",
+    "pidusage": "^3.0.2",
     "prom-client": "^14.1.0",
     "reflect-metadata": "^0.1.13",
     "ts-loader": "^9.5.1",

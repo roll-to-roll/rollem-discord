@@ -2212,6 +2212,7 @@ __metadata:
     "@types/lodash": "npm:^4.14.170"
     "@types/mocha": "npm:^8"
     "@types/node": "npm:^18"
+    "@types/pidusage": "npm:^2.0.5"
     applicationinsights: "npm:^2.9.1"
     chai: "npm:^3.5.0"
     chance: "npm:^1.1.5"
@@ -2240,6 +2241,7 @@ __metadata:
     pegjs: "npm:0.10.0"
     pegjs-loader: "npm:^0.5.6"
     pg: "npm:^8.6.0"
+    pidusage: "npm:^3.0.2"
     prom-client: "npm:^14.1.0"
     reflect-metadata: "npm:^0.1.13"
     ts-loader: "npm:^9.5.1"
@@ -2920,6 +2922,13 @@ __metadata:
   version: 4.0.2
   resolution: "@types/parse-json@npm:4.0.2"
   checksum: 10c0/b1b863ac34a2c2172fbe0807a1ec4d5cb684e48d422d15ec95980b81475fac4fdb3768a8b13eef39130203a7c04340fc167bae057c7ebcafd7dec9fe6c36aeb1
+  languageName: node
+  linkType: hard
+
+"@types/pidusage@npm:^2.0.5":
+  version: 2.0.5
+  resolution: "@types/pidusage@npm:2.0.5"
+  checksum: 10c0/f4add16388280410604254c91499b873f95c98146c0a8016e09733d3d5c4362b7a5f56e2f1a5e9677772ab97ac37ffb1194d3ad43f872364d9d86856d4db414c
   languageName: node
   linkType: hard
 
@@ -15947,6 +15956,15 @@ __metadata:
   version: 2.3.1
   resolution: "picomatch@npm:2.3.1"
   checksum: 10c0/26c02b8d06f03206fc2ab8d16f19960f2ff9e81a658f831ecb656d8f17d9edc799e8364b1f4a7873e89d9702dff96204be0fa26fe4181f6843f040f819dac4be
+  languageName: node
+  linkType: hard
+
+"pidusage@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "pidusage@npm:3.0.2"
+  dependencies:
+    safe-buffer: "npm:^5.2.1"
+  checksum: 10c0/605722ab95e146ebaeb224285023d5c95bd383d460769cb00be774d125d654193b5de806fe9d6e6c9e4994687524f7285fc35bd5c653081c28ee6bd24d11b854
   languageName: node
   linkType: hard
 
