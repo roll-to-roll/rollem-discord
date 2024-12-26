@@ -70,16 +70,16 @@ export class EventMonitorBehavior extends DiscordBehaviorBase {
         return {
           guildId: messageUpdate.guildId ?? 'DM',
         };
-      case 'typingStart':
-        const [typing] = args as ClientEvents['typingStart'];
-        return {
-          guildId: typing?.guild?.id ?? 'DM',
-        };
-      case 'presenceUpdate':
-        const [presenceUpdate] = args as ClientEvents['presenceUpdate'];
-        return {
-          guildId: presenceUpdate?.guild?.id ?? 'DM',
-        };
+      // case 'typingStart':
+      //   const [typing] = args as ClientEvents['typingStart'];
+      //   return {
+      //     guildId: typing?.guildId ?? 'DM',
+      //   };
+      // case 'presenceUpdate':
+      //   const [presenceUpdate] = args as ClientEvents['presenceUpdate'];
+      //   return {
+      //     guildId: presenceUpdate?.guildId ?? 'DM',
+      //   };
       case 'userUpdate':
         const [userUpdate] = args as ClientEvents['userUpdate'];
         return { };
@@ -103,11 +103,11 @@ export class EventMonitorBehavior extends DiscordBehaviorBase {
         return {
           guildId: guildUnavailable?.id ?? 'DM',
         };
-      case 'voiceStateUpdate':
-        const [voiceStateUpdate] = args as ClientEvents['voiceStateUpdate'];
-        return {
-          guildId: voiceStateUpdate?.guild?.id ?? 'DM',
-        };
+      // case 'voiceStateUpdate':
+      //   const [voiceStateUpdate] = args as ClientEvents['voiceStateUpdate'];
+      //   return {
+      //     guildId: voiceStateUpdate?.guildId ?? 'DM',
+      //   };
     }
 
     return null;

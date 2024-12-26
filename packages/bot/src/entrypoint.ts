@@ -97,8 +97,14 @@ async function doInit() {
   const config = intermediateDiscordScope.get(Config);
   const ourBucket = intermediateDiscordScope.get(DiscordClientConfigService).ourBucket;
   const client = intermediateDiscordScope.get(DiscordClientService).client;
+  client.on('messageCreate', async message => {
+    console.log("message");
+    const author = await message.guild?.members.fetchMe();
+    const authorRoleNames = author?.roles.cache.map(r => r.name) ?? [];
+    console.debug(authorRoleNames);
+  });
   
-  setInterval(async () => await printUsage(), 1_000);
+  setInterval(async () => await printUsage(), 10_000);
   
   intermediateDiscordScope.initialize();
 
@@ -128,6 +134,7 @@ async function doInit() {
     console.debug("Auths Remaining: ", humanizeInteger(limit.remaining), "/", humanizeInteger(limit.total), " ≈ ", Math.floor(limit.remaining/limit.total*10000)/100, "%");
     console.debug("      Resets in: ", ...humanizeMillisForDebug(limit.reset_after));
     console.debug("###########################");
+    console.debug("Cacched Guilds:", client.guilds.cache.size);
     console.debug("###########################");
   
   }

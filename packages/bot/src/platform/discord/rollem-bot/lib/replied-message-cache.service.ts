@@ -18,7 +18,7 @@ export class RepliedMessageCache extends NodeCache {
 
   /** Returns false the first time it's passed a message, and then true after. */
   public hasSeenMessageBefore(message: Message, type: string): boolean {
-    const key = `${message.guild?.id}-${message.channel?.id}-${message.id}-${type}`
+    const key = `${message.guildId}-${message.channelId}-${message.id}-${type}`
     if (this.has(key)) {
       return true;
     }

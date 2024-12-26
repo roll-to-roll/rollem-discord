@@ -34,19 +34,11 @@ export abstract class DiscordBehaviorBase implements IInitializeable {
 
   /** Handle an unknown rejection. */
   protected handleRejection(label: string, error: Error) {
-    // let guildId = message.guild ? message.guild.id : null;
-    // let channelId = message.channel ? message.channel.id : null;
-    // let messageId = message.id;
-    // let userId = message.userId;
     this.logger.trackError(LoggerCategory.SystemEvent, label, error);
   }
   
   /** Handle a rejected send request. */
   protected handleSendRejection(message) {
-    // let guildId = message.guild ? message.guild.id : null;
-    // let channelId = message.channel ? message.channel.id : null;
-    // let messageId = message.id;
-    // let userId = message.userId;
     this.logger.trackMessageEvent(LoggerCategory.SystemEvent, "Missing send permission", message);
   }
 }

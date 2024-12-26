@@ -92,7 +92,7 @@ export class StandardAdapter extends DiscordBehaviorBase {
     }
 
     // treat all DMs as pinged messages
-    if (!message.guild) {
+    if (!message.guildId) {
       return { content: strippedContent, prefixStyle: PrefixStyle.DirectPing };
     }
 
@@ -157,18 +157,18 @@ export class StandardAdapter extends DiscordBehaviorBase {
   }
 
   private getRelevantRoleNames(message: Message, prefix: string): { rollemRoles: string[], authorRoles: string[] } {
-    if (!message.guild) {
+    if (!message.guildId) {
       return {
         rollemRoles: [],
         authorRoles: [],
       };
     }
 
-    const me = message.guild.members.cache.get(this.client.user?.id || "0");
+    const me = message.guild?.members.cache.get(this.client.user?.id || "0");
     const myRoleNames = me?.roles.cache.map(r => r.name) ?? [];
     const myRoles = myRoleNames.filter(rn => rn.startsWith(prefix));
 
-    const author = message.guild.members.cache.get(message.author?.id || "0");
+    const author = message.guild?.members.cache.get(message.author?.id || "0");
     const authorRoleNames = author?.roles.cache.map(r => r.name) ?? [];
     const authorRoles = authorRoleNames.filter(rn => rn.startsWith(prefix));
     return {

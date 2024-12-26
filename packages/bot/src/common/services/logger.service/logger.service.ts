@@ -181,9 +181,9 @@ export class Logger {
   /** Adds common AI properties to the given object (or creates one). Returns the given object. */
   private enrichAIProperties(message: Message|null, object = {}) {
     // if (this.client && this.client.user) {
-      object['Guild ID'] = '' + (message?.guild?.id ?? 'none');
+      object['Guild ID'] = '' + (message?.guildId ?? 'none');
       object['Author ID'] = '' + (message?.author?.id ?? 'none');
-      object['Channel ID'] = '' + (message?.channel?.id ?? 'none');
+      object['Channel ID'] = '' + (message?.channelId ?? 'none');
       object["Message ID"] = '' + (message?.id ?? '');
       object["Shard Name"] = '' + this.shardName();
       // object["Client ID"] = '' + this.client.user.id;
