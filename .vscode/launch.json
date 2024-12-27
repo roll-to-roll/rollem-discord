@@ -5,6 +5,19 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Discord Bot",
+      "program": "${workspaceFolder}/packages/bot/dist/bundle.js",
+      "envFile": "${workspaceFolder}/secrets/vscode.env",
+      "cwd": "${workspaceFolder}/packages/bot/",
+      "sourceMaps": true,
+      "restart": true,
+      "console": "integratedTerminal",
+      // "preLaunchTask": "tsc: build - tsconfig.json",
+      // "outFiles": ["${workspaceFolder}/out/**/*.js"]
+    },
+    {
       "type": "pwa-node",
       "request": "launch",
       "name": "Launch Bot",

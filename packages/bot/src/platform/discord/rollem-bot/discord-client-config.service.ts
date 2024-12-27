@@ -1,12 +1,13 @@
-import { APIGatewayBotInfo, CacheConstructors, CacheFactory, CacheWithLimitsOptions, Caches, ClientOptions, Collection, IIdentifyThrottler, IntentsBitField, Options, Partials, SimpleIdentifyThrottler } from "discord.js";
+import { APIGatewayBotInfo, CacheConstructors, CacheFactory, CacheWithLimitsOptions, CachedManager, Caches, Client, ClientOptions, Collection, Constructable, IIdentifyThrottler, IntentsBitField, Options, Partials, RoleManager, SimpleIdentifyThrottler } from "discord.js";
 import { Injectable } from "injection-js";
 import { Config } from "./discord-config.service";
 import { IInitializeable } from "@common/util/injector-wrapper";
 import { ShardGroupings, ShardRateLimitBucket, fetchGatewayBotInfo, groupShardsByRateLimitKey } from "@root/platform/discord/startup";
 import { RollemInitializerError } from "@common/errors/initializer-error";
 import { THROW } from "@common/errors/do-error";
-import { MinimalLimitedCache } from "@bot/discord-client-minimal-cache";
-import { PretendCache } from "@bot/discord-client-pretend-cache";
+import { MinimalLimitedCache } from "@root/platform/discord/cache-monkeypatch/discord-client-minimal-cache";
+import { PretendCache } from "@root/platform/discord/cache-monkeypatch/discord-client-pretend-cache";
+import { RoleCollection } from "@root/platform/discord/cache-monkeypatch/role.collection";
 
 /** Coordinates selection and construction of {@link ClientOptions} for {@link Client}. */
 @Injectable()
@@ -25,7 +26,7 @@ export class DiscordClientConfigService implements IInitializeable {
     await this.config.initialize();
     
     this.botInfo = await fetchGatewayBotInfo(this.config.Token);
-    this.grouping = groupShardsByRateLimitKey(this.botInfo, { forceShardCount: 1});
+    this.grouping = groupShardsByRateLimitKey(this.botInfo, { forceShardCount: this.config.forcedShardCount });
     this.ourBucket = this.grouping.noRateLimitBuckets[0];
   }
 
@@ -63,28 +64,37 @@ export class DiscordClientConfigService implements IInitializeable {
 
     settings ??= {};
     return (
-      managerType: CacheConstructors[keyof Caches],
-      holds: Caches[(typeof manager)['name']][1],
-      manager: CacheConstructors[keyof Caches]
+      managerConstructorOrOverride: CacheConstructors[keyof Caches],
+      holdsConstructor: Caches[(typeof managerConstructor)['name']][1],
+      managerConstructor: CacheConstructors[keyof Caches]
     ) => {
-      const name = manager.name ?? managerType.name;
+      const name = managerConstructor.name ?? managerConstructorOrOverride.name;
+      if ((managerConstructor as any) === RoleManager) {
+        return new RoleCollection(
+          managerConstructorOrOverride as any,
+          holdsConstructor as any,
+          { maxSize: 0 },
+        )
+      }
       switch (name) {
+        case '123124124123' as any:
         case 'GuildManager' as any:
-        case 'RoleManager' as any:
-        case 'PermissionOverwriteManager' as any:
         case 'ChannelManager' as any:
+        // case 'RoleManager' as any:
+        // case 'PermissionOverwriteManager' as any:
+        // case 'GuildMemberManager': // stores role info
+        
         // these are also on the "override" list
         // case 'DMMessageManager' as any:
         // case 'GuildForumThreadManager' as any:
         // case 'GuildMessageManager' as any:
         // case 'GuildTextThreadManager' as any:
-        case 'GuildMemberManager': // stores role info
 
         // case 'DMMessageManager':
         // case 'MessageManager':
         // case 'UserManager':
         // case 'GuildMessageManager':
-          return regularFactory(managerType as any, holds, manager);
+          return regularFactory(managerConstructorOrOverride as any, holdsConstructor, managerConstructor);
         default:
           return PretendCache.makeOne(name);
       }
@@ -157,7 +167,7 @@ export class DiscordClientConfigService implements IInitializeable {
       ws: {
         // no waiting. we have specifically selected shards to not share rate-limit-keys
         buildIdentifyThrottler: async _ => Promise.resolve({
-          waitForIdentify(shardId, signal) {
+          waitForIdentify(_shardId, _signal) {
             return Promise.resolve();
           }
         })

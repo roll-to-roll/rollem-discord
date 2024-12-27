@@ -6,6 +6,7 @@ import { defaults } from "lodash";
 import { IInitializeable } from "@common/util/injector-wrapper";
 import { Config } from "@bot/discord-config.service";
 import { DiscordBehaviorBase } from "@bot/behaviors/discord.behavior.base";
+import { GLOBAL_STATE } from "@root/platform/discord/global-state";
 
 @Injectable()
 export class DiscordClientService implements IInitializeable {
@@ -28,6 +29,10 @@ export class DiscordClientService implements IInitializeable {
 
   public async initialize(): Promise<void> {
     this.client.on('debug', m => console.debug(m));
+    this.client.on('ready', c => {
+      console.debug("======================================== READY ========================================");
+      // GLOBAL_STATE.isAfterStartup = true;
+    });
     await this.client.login(this.envConfig.Token);
   }
 }

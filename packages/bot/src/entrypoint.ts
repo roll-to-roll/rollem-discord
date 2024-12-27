@@ -1,5 +1,6 @@
 // these must be the first imported items
 import "reflect-metadata";
+import "@root/platform/discord/cache-monkeypatch/cached-manager.monkeypatch";
 import nodeFetch from 'node-fetch';
 import util from 'util';
 global.fetch = nodeFetch as any;
@@ -98,10 +99,11 @@ async function doInit() {
   const ourBucket = intermediateDiscordScope.get(DiscordClientConfigService).ourBucket;
   const client = intermediateDiscordScope.get(DiscordClientService).client;
   client.on('messageCreate', async message => {
-    console.log("message");
+    console.log("==================== message");
     const author = await message.guild?.members.fetchMe();
     const authorRoleNames = author?.roles.cache.map(r => r.name) ?? [];
     console.debug(authorRoleNames);
+    console.log("==================== /message")
   });
   
   setInterval(async () => await printUsage(), 10_000);

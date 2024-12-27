@@ -5,6 +5,9 @@ import { Injectable } from "injection-js";
 @Injectable()
 export class Config implements IInitializeable {
   /** The ID of this shard. Must be below @see ShardCount. */
+  public readonly forcedShardCount = process.env.DISCORD_BOT_FORCED_SHARD_COUNT ? +process.env.DISCORD_BOT_FORCED_SHARD_COUNT : undefined;
+
+  /** The ID of this shard. Must be below @see ShardCount. */
   public readonly ShardId = process.env.DISCORD_BOT_SHARD_ID ? +process.env.DISCORD_BOT_SHARD_ID : undefined;
 
   /** The number of shards. */
