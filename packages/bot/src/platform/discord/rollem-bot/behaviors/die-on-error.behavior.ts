@@ -4,7 +4,7 @@ import { Client } from "discord.js";
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
-import { DiscordClientService } from "@bot/discord-client.service";
+import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
 
 // TODO: there's got to be a cleaner way to handle this, but this seems to make it more resilient.
 

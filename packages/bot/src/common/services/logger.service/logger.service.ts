@@ -1,7 +1,7 @@
 // enable application insights if we have an instrumentation key set up
 import * as appInsights from "applicationinsights";
 import { Client, Message } from "discord.js";
-import { Config } from "../../../platform/discord/rollem-bot/discord-config.service";
+import { OriginalConfig } from "../../../platform/original-config.service";
 import util from "util";
 import { Injectable } from "injection-js";
 
@@ -22,7 +22,7 @@ export class Logger {
 
   constructor(
     /** The associated config. */
-    public config: Config,
+    public config: OriginalConfig,
   ) {
     if (config.AppInsightsConnectionString) {
       try {

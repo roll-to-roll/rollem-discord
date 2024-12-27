@@ -4,8 +4,8 @@ import { Client, Message, User, MessageReaction } from "discord.js";
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
-import { Config } from "@bot/discord-config.service";
-import { DiscordClientService } from "@bot/discord-client.service";
+import { OriginalConfig } from "@root/platform/original-config.service";
+import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
 
 // TODO: there's got to be a cleaner way to handle this, but this seems to make it more resilient.
 
@@ -22,7 +22,7 @@ export class DeadmanSwitchBehavior extends DiscordBehaviorBase {
     client: DiscordClientService,
     promLogger: PromLogger,
     logger: Logger,
-    private readonly config: Config
+    private readonly config: OriginalConfig
   ) { super(client, promLogger, logger); }
 
   private activityInLastMinute = 0;

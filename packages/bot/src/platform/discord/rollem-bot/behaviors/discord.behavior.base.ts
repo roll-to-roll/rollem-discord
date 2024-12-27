@@ -3,7 +3,7 @@ import { Logger, LoggerCategory } from "@common/services/logger.service/logger.s
 import { ClassProvider, Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { Newable } from "@common/util/types/utility-types";
-import { DiscordClientService } from "@bot/discord-client.service";
+import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
 import { IInitializeable } from "@common/util/injector-wrapper";
 
 /** A base for behaviors to be applied to a discord client. */

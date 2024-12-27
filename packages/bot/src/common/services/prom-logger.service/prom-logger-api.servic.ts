@@ -1,6 +1,6 @@
 import express from 'express';
 import * as client from 'prom-client';
-import { Config } from '../../../platform/discord/rollem-bot/discord-config.service';
+import { OriginalConfig } from '../../../platform/original-config.service';
 import { Server } from 'http';
 
 const app = express();
@@ -18,7 +18,7 @@ app.get('/metrics', async (req, res) => {
 
 app.get('/', async (req, res) => {
   try {
-    const config = new Config();
+    const config = new OriginalConfig();
     res.status(200).end(JSON.stringify({
       time: new Date().toISOString(),
       shard: config.ShardLabel,

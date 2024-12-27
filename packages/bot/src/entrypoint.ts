@@ -1,11 +1,10 @@
 // these must be the first imported items
 import "reflect-metadata";
-import "@root/platform/discord/cache-monkeypatch/cached-manager.monkeypatch";
 import nodeFetch from 'node-fetch';
 import util from 'util';
 global.fetch = nodeFetch as any;
 
-import { Config } from "@bot/discord-config.service";
+import { OriginalConfig } from "@root/platform/original-config.service";
 
 import { InjectorWrapper } from "@common/util/injector-wrapper";
 import { Storage } from "@rollem/common";
@@ -17,8 +16,8 @@ import { RepliedMessageCache } from "@bot/lib/replied-message-cache.service";
 import { Parsers } from "@common/services/parsers.service";
 import { RollemParserV1, RollemParserV1Beta, RollemParserV2 } from "@rollem/language";
 import { PromLoggerApi } from "@common/services/prom-logger.service/prom-logger-api.servic";
-import { DiscordClientConfigService } from "@bot/discord-client-config.service";
-import { DiscordClientService } from "@bot/discord-client.service";
+import { ClientConfigService } from "@root/platform/discord/client/client-config.service";
+import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
 import { DeadmanSwitchBehavior } from "@bot/behaviors/deadman-switch";
 import { DieOnDisconnectBehavior } from "@bot/behaviors/die-on-disconnect.behavior";
 import { DieOnErrorBehavior } from "@bot/behaviors/die-on-error.behavior";
@@ -44,6 +43,8 @@ import pidusage from "pidusage";
 import { fetchGatewayBotInfo } from "@root/platform/discord/startup";
 import { humanizeInteger } from "@common/util/number-with-commas";
 import { humanizeMillisForDebug } from "@common/util/humanize-duration";
+import { CacheService } from "@root/platform/discord/client/cache/cache.service";
+import { GlobalAppState } from "@root/platform/discord/global-app-state";
 
 const ORDERED_STANDARD_BEHAVIORS: Newable<BehaviorBase>[] = [
   PingPongBehavior,
@@ -73,14 +74,16 @@ async function doInit() {
     Logger,
     ChangeLog,
     RollemRandomSources,
-    Config,
+    OriginalConfig,
     { provide: Storage, useValue: new Storage() },
     RollemParserV1,
     RollemParserV1Beta,
     RollemParserV2,
     Parsers,
     RepliedMessageCache,
-    DiscordClientConfigService,
+    ClientConfigService,
+    CacheService,
+    // { provide: GlobalAppState, useValue: GlobalAppState.Instance },
   ]).validateAllOrThrow().initialize();
   console.log("CONTINUING");
   const intermediateDiscordScope = topLevelScope.createChildContext([
@@ -95,9 +98,10 @@ async function doInit() {
     ...ORDERED_DISCORD_BEHAVIORS,
   ]).validateAllOrThrow()
   
-  const config = intermediateDiscordScope.get(Config);
-  const ourBucket = intermediateDiscordScope.get(DiscordClientConfigService).ourBucket;
+  const config = intermediateDiscordScope.get(OriginalConfig);
+  const ourBucket = intermediateDiscordScope.get(ClientConfigService).ourBucket;
   const client = intermediateDiscordScope.get(DiscordClientService).client;
+  const cache = intermediateDiscordScope.get(CacheService);
   client.on('messageCreate', async message => {
     console.log("==================== message");
     const author = await message.guild?.members.fetchMe();
@@ -136,7 +140,9 @@ async function doInit() {
     console.debug("Auths Remaining: ", humanizeInteger(limit.remaining), "/", humanizeInteger(limit.total), " ≈ ", Math.floor(limit.remaining/limit.total*10000)/100, "%");
     console.debug("      Resets in: ", ...humanizeMillisForDebug(limit.reset_after));
     console.debug("###########################");
-    console.debug("Cacched Guilds:", client.guilds.cache.size);
+    console.debug("Cached Guilds:", client.guilds.cache.size);
+    console.debug("###########################");
+    console.debug("###########################");
     console.debug("###########################");
   
   }

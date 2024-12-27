@@ -1,12 +1,12 @@
 import { DiscordBehaviorBase } from "./discord.behavior.base";
 import { ActivityType, Client } from "discord.js";
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
-import { Config } from "@bot/discord-config.service";
+import { OriginalConfig } from "@root/platform/original-config.service";
 import { ChangeLog } from "@common/services/changelog/changelog";
 import moment from "moment";
 import { Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
-import { DiscordClientService } from "@bot/discord-client.service";
+import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
 
 /**
  * Initializes the system after login and starts the heartbeat.
@@ -14,7 +14,7 @@ import { DiscordClientService } from "@bot/discord-client.service";
 @Injectable()
 export class HeartbeatBehavior extends DiscordBehaviorBase {
   constructor(
-    private readonly config: Config,
+    private readonly config: OriginalConfig,
     private readonly changelog: ChangeLog,
     client: DiscordClientService,
     promLogger: PromLogger,

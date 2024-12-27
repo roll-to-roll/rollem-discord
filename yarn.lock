@@ -2238,6 +2238,7 @@ __metadata:
     node-fetch: "npm:^3.0.0"
     npm: "npm:^6.3.0"
     nyc: "npm:^15.0.1"
+    object-sizeof: "npm:^2.6.5"
     pegjs: "npm:0.10.0"
     pegjs-loader: "npm:^0.5.6"
     pg: "npm:^8.6.0"
@@ -15045,6 +15046,15 @@ __metadata:
   version: 1.1.1
   resolution: "object-keys@npm:1.1.1"
   checksum: 10c0/b11f7ccdbc6d406d1f186cdadb9d54738e347b2692a14439ca5ac70c225fa6db46db809711b78589866d47b25fc3e8dee0b4c722ac751e11180f9380e3d8601d
+  languageName: node
+  linkType: hard
+
+"object-sizeof@npm:^2.6.5":
+  version: 2.6.5
+  resolution: "object-sizeof@npm:2.6.5"
+  dependencies:
+    buffer: "npm:^6.0.3"
+  checksum: 10c0/ae733fc7aaf8eb2446aa632a34a2a30c9535afdb1997a626bf8912e64893c1afa0e1e6a9153235c09c6e8d586100eeb6fe2d869a82dcee00144cb11efb229d8e
   languageName: node
   linkType: hard
 

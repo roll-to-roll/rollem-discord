@@ -4,7 +4,7 @@ import { PromLoggerApi } from "../../../common/services/prom-logger.service/prom
 
 import { Logger, LoggerCategory } from "../../../common/services/logger.service/logger.service";
 
-import { Config } from "./discord-config.service";
+import { OriginalConfig } from "../../original-config.service";
 
 import { Parsers } from "@common/services/parsers.service";
 
@@ -39,7 +39,7 @@ export namespace Bootstrapper {
       Logger,
       ChangeLog,
       RollemRandomSources,
-      Config,
+      OriginalConfig,
       { provide: Storage, useValue: new Storage() },
       RollemParserV1,
       RollemParserV1Beta,
@@ -62,7 +62,7 @@ export namespace Bootstrapper {
     }
     const logger = topLevelInjector.get(Logger);
     strict(!!logger, "DI failed to resolve logger");
-    const config = topLevelInjector.get(Config);
+    const config = topLevelInjector.get(OriginalConfig);
     strict(!!config, "DI failed to resolve config");
     const changelog = topLevelInjector.get(ChangeLog);
     strict(!!changelog, "DI failed to resolve changelog");
@@ -110,7 +110,7 @@ export namespace Bootstrapper {
   /** Creates the client and hooks it up to the logger. */
   export function prepareClient(topLevelInjector: InjectorWrapper, clientOptionsTweaks?: Partial<ClientOptions>) {
     const logger = topLevelInjector.get(Logger);
-    const config = topLevelInjector.get(Config);
+    const config = topLevelInjector.get(OriginalConfig);
 
     logger.trackSimpleEvent(LoggerCategory.SystemEvent, "Constructing client...");
     logger.trackSimpleEvent(LoggerCategory.SystemEvent, "Shard ID: " + config.ShardId)
@@ -190,7 +190,7 @@ export namespace Bootstrapper {
   export function startClient(clientLevelInjector: InjectorWrapper) {
     const logger = clientLevelInjector.get(Logger);
     const client = clientLevelInjector.get(Client);
-    const config = clientLevelInjector.get(Config);
+    const config = clientLevelInjector.get(OriginalConfig);
 
     logger.trackSimpleEvent(LoggerCategory.SystemEvent, "Ready to start. Logging in...");
     client.login(config.Token);

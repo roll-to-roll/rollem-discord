@@ -1,4 +1,4 @@
-import { Config } from "@bot/discord-config.service";
+import { OriginalConfig } from "@root/platform/original-config.service";
 import { Parsers } from "@common/services/parsers.service";
 import { RollemRandomSources } from "@bot/lib/rollem-random-sources.service";
 import { Logger } from "@common/services/logger.service/logger.service";
@@ -21,7 +21,7 @@ export class DiceShortPrefixedBehavior extends DiceBehaviorBase {
 
   constructor(
     parsers: Parsers,
-    config: Config,
+    config: OriginalConfig,
     rng: RollemRandomSources,
     promLogger: PromLogger,
     logger: Logger

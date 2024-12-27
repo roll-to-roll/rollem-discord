@@ -1,4 +1,4 @@
-import { DiscordClientService } from "@bot/discord-client.service";
+import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
 import { Logger } from "@common/services/logger.service/logger.service";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { BehaviorStatsBase, BotStats } from "@common/standard-behaviors/stat.behavior.base";

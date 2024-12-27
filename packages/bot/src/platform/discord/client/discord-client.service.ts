@@ -1,12 +1,12 @@
 import { Inject, Injectable } from "injection-js";
-import { DiscordClientConfigService } from "./discord-client-config.service";
+import { ClientConfigService } from "./client-config.service";
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { BitFieldResolvable, Client, ClientOptions, GatewayIntentsString, IntentsBitField, Partials } from "discord.js";
 import { defaults } from "lodash";
 import { IInitializeable } from "@common/util/injector-wrapper";
-import { Config } from "@bot/discord-config.service";
+import { OriginalConfig } from "@root/platform/original-config.service";
 import { DiscordBehaviorBase } from "@bot/behaviors/discord.behavior.base";
-import { GLOBAL_STATE } from "@root/platform/discord/global-state";
+import { GLOBAL_STATE } from "@root/platform/discord/global-app-state";
 
 @Injectable()
 export class DiscordClientService implements IInitializeable {
@@ -14,8 +14,8 @@ export class DiscordClientService implements IInitializeable {
 
   constructor(
     private readonly logger: Logger,
-    private readonly clientConfig: DiscordClientConfigService,
-    private readonly envConfig: Config,
+    private readonly clientConfig: ClientConfigService,
+    private readonly envConfig: OriginalConfig,
   ) {
     const options = this.clientConfig.clientOptions;
     logger.trackSimpleEvent(LoggerCategory.SystemEvent, "Constructing client...");
@@ -31,7 +31,7 @@ export class DiscordClientService implements IInitializeable {
     this.client.on('debug', m => console.debug(m));
     this.client.on('ready', c => {
       console.debug("======================================== READY ========================================");
-      // GLOBAL_STATE.isAfterStartup = true;
+      GLOBAL_STATE.isAfterClientReady = true;
     });
     await this.client.login(this.envConfig.Token);
   }

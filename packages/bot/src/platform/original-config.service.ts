@@ -3,7 +3,7 @@ import { Injectable } from "injection-js";
 
 /** Loads and stores various configuration values. */
 @Injectable()
-export class Config implements IInitializeable {
+export class OriginalConfig implements IInitializeable {
   /** The ID of this shard. Must be below @see ShardCount. */
   public readonly forcedShardCount = process.env.DISCORD_BOT_FORCED_SHARD_COUNT ? +process.env.DISCORD_BOT_FORCED_SHARD_COUNT : undefined;
 

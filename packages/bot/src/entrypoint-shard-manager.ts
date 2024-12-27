@@ -5,14 +5,14 @@ import util from 'util';
 global.fetch = nodeFetch as any;
 
 import { ShardingManager, ShardingManagerOptions } from "discord.js";
-import { Config } from "@bot/discord-config.service";
+import { OriginalConfig } from "@root/platform/original-config.service";
 import { fetchGatewayBotInfo, groupShardsByRateLimitKey } from "./platform/discord/startup";
 import { env } from "process";
 import pidusage from "pidusage";
 
 
 async function doInit() {
-  const config = new Config();
+  const config = new OriginalConfig();
   const botInfo = await fetchGatewayBotInfo(config.Token);
   const grouping = groupShardsByRateLimitKey(botInfo, { forceShardCount: 176});
   

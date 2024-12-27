@@ -2,7 +2,7 @@ import { ParserVersion } from '@common/standard-behaviors/types/behavior-context
 import { Injectable } from 'injection-js';
 import * as client from 'prom-client';
 import { ChangeLog } from '../changelog/changelog';
-import { Config } from '../../../platform/discord/rollem-bot/discord-config.service';
+import { OriginalConfig } from '../../../platform/original-config.service';
 
 export enum HandlerType {
   Roll = 'roll',
@@ -38,7 +38,7 @@ export enum StorageHandlerSubtype {
 @Injectable()
 export class PromLogger {
   constructor(
-    config: Config,
+    config: OriginalConfig,
     changelog: ChangeLog,
   ) {
     const shardLabel = config.ShardLabel;

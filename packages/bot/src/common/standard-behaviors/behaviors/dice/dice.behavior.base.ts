@@ -1,4 +1,4 @@
-import { Config } from "@bot/discord-config.service";
+import { OriginalConfig } from "@root/platform/original-config.service";
 import { Parsers } from "@common/services/parsers.service";
 import { RollemRandomSources } from "@bot/lib/rollem-random-sources.service";
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
@@ -15,7 +15,7 @@ import _, { chain, chunk } from "lodash";
 export abstract class DiceBehaviorBase extends BehaviorBase {
   constructor(
     protected readonly parsers: Parsers,
-    protected readonly config: Config,
+    protected readonly config: OriginalConfig,
     protected readonly rng: RollemRandomSources,
     promLogger: PromLogger,
     logger: Logger,

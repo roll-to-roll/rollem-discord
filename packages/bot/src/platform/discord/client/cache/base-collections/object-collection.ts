@@ -2,10 +2,13 @@
 import { Collection, ReadonlyCollection } from "discord.js";
 import { entries, forEach, forOwn, has, keys, values } from "lodash";
 
+/**
+ * An experimental collection based on Object-style dict as a backing store.
+ * I hoped it would reduce memory usage, but it didn't seem to.
+ * Keeping it around for further testing.
+ */
 export class ObjectCollection<Key extends string | number | symbol, Value>
 {
-
-  
   protected backingObject: Record<Key, Value> = {} as Record<Key, Value>;
 
   constructor();
