@@ -1,4 +1,4 @@
-import { APIGatewayBotInfo, CacheConstructors, CacheFactory, CacheWithLimitsOptions, CachedManager, Caches, Client, ClientOptions, Collection, Constructable, IIdentifyThrottler, IntentsBitField, Options, Partials, RoleManager, SimpleIdentifyThrottler } from "discord.js";
+import { APIGatewayBotInfo, CacheConstructors, CacheFactory, CacheWithLimitsOptions, CachedManager, Caches, Client, ClientOptions, Collection, Constructable, Guild, GuildManager, IIdentifyThrottler, IntentsBitField, Options, Partials, Role, RoleManager, SimpleIdentifyThrottler, Channel, BaseChannel, GuildMemberManager } from "discord.js";
 import { Injectable } from "injection-js";
 import { Config } from "./discord-config.service";
 import { IInitializeable } from "@common/util/injector-wrapper";
@@ -7,7 +7,7 @@ import { RollemInitializerError } from "@common/errors/initializer-error";
 import { THROW } from "@common/errors/do-error";
 import { MinimalLimitedCache } from "@root/platform/discord/cache-monkeypatch/discord-client-minimal-cache";
 import { PretendCache } from "@root/platform/discord/cache-monkeypatch/discord-client-pretend-cache";
-import { RoleCollection } from "@root/platform/discord/cache-monkeypatch/role.collection";
+import { ChannelCollection, GuildCollection, GuildMemberCollection, RoleCollection, SpecialCollection } from "@root/platform/discord/cache-monkeypatch/role.collection";
 
 /** Coordinates selection and construction of {@link ClientOptions} for {@link Client}. */
 @Injectable()
@@ -18,6 +18,8 @@ export class DiscordClientConfigService implements IInitializeable {
 
   constructor(private readonly config: Config) {
   }
+
+  public unifiedCache = new RoleCollection<any>(null, null as any, null as any);
 
   public async initialize(): Promise<void> {
     if (!!this.botInfo) { return; }
@@ -33,33 +35,33 @@ export class DiscordClientConfigService implements IInitializeable {
   public cacheFactoryFactory(settings: CacheWithLimitsOptions): CacheFactory {
     const regularFactory = Options.cacheWithLimits({
       ...Options.DefaultMakeCacheSettings,
-      GuildMemberManager: {
-        maxSize: 0,
-        keepOverLimit: member => member.id === member.client.user.id,
-      }, // we might need this for replies
-      GuildMessageManager: {maxSize: 0}, // we might need this for replies
-      GuildTextThreadManager: {maxSize: 0}, // we might need this for replies
-      MessageManager: {maxSize: 0}, // we might need this for replies
-      DMMessageManager: {maxSize: 0}, // we might need this for replies
-      GuildEmojiManager: {maxSize: 0}, // we might want this for reacts
-      UserManager: {maxSize: 0}, // we might need this for replies
-      ThreadManager: {maxSize: 0}, // we might need this for replies
+      // GuildMemberManager: {
+      //   maxSize: 0,
+      //   keepOverLimit: member => member.id === member.client.user.id,
+      // }, // we might need this for replies
+      // GuildMessageManager: {maxSize: 0}, // we might need this for replies
+      // GuildTextThreadManager: {maxSize: 0}, // we might need this for replies
+      // MessageManager: {maxSize: 0}, // we might need this for replies
+      // DMMessageManager: {maxSize: 0}, // we might need this for replies
+      // GuildEmojiManager: {maxSize: 0}, // we might want this for reacts
+      // UserManager: {maxSize: 0}, // we might need this for replies
+      // ThreadManager: {maxSize: 0}, // we might need this for replies
 
-      // we should never need any of these
-      GuildBanManager: {maxSize: 0},
-      ApplicationCommandManager: {maxSize: 0},
-      AutoModerationRuleManager: {maxSize: 0},
-      BaseGuildEmojiManager: {maxSize: 0},
-      GuildForumThreadManager: {maxSize: 0},
-      GuildInviteManager: {maxSize: 0},
-      GuildScheduledEventManager: {maxSize: 0},
-      GuildStickerManager: {maxSize: 0},
-      PresenceManager: {maxSize: 0},
-      ReactionManager: {maxSize: 0},
-      ReactionUserManager: {maxSize: 0},
-      StageInstanceManager: {maxSize: 0},
-      ThreadMemberManager: {maxSize: 0},
-      VoiceStateManager: {maxSize: 0},
+      // // we should never need any of these
+      // GuildBanManager: {maxSize: 0},
+      // ApplicationCommandManager: {maxSize: 0},
+      // AutoModerationRuleManager: {maxSize: 0},
+      // BaseGuildEmojiManager: {maxSize: 0},
+      // GuildForumThreadManager: {maxSize: 0},
+      // GuildInviteManager: {maxSize: 0},
+      // GuildScheduledEventManager: {maxSize: 0},
+      // GuildStickerManager: {maxSize: 0},
+      // PresenceManager: {maxSize: 0},
+      // ReactionManager: {maxSize: 0},
+      // ReactionUserManager: {maxSize: 0},
+      // StageInstanceManager: {maxSize: 0},
+      // ThreadMemberManager: {maxSize: 0},
+      // VoiceStateManager: {maxSize: 0},
     });
 
     settings ??= {};
@@ -70,19 +72,24 @@ export class DiscordClientConfigService implements IInitializeable {
     ) => {
       const name = managerConstructor.name ?? managerConstructorOrOverride.name;
       if ((managerConstructor as any) === RoleManager) {
-        return new RoleCollection(
-          managerConstructorOrOverride as any,
-          holdsConstructor as any,
-          { maxSize: 0 },
-        )
+        return new RoleCollection<any>(null, null as any, null as any);;
+      }
+      if ((managerConstructor as any) === GuildManager) {
+        return new SpecialCollection<any, any>(null, null as any, null as any);;
       }
       switch (name) {
-        case '123124124123' as any:
+        case 'RoleManager' as any:
+          return new RoleCollection(null as any, Role);
         case 'GuildManager' as any:
+          return new GuildCollection(null as any, Guild);
         case 'ChannelManager' as any:
+          return new ChannelCollection(null as any, holdsConstructor);
+        case 'GuildMemberManager': // stores role info
+          return new GuildMemberCollection(null as any, holdsConstructor);
+        case '123124124123' as any:
         // case 'RoleManager' as any:
         // case 'PermissionOverwriteManager' as any:
-        // case 'GuildMemberManager': // stores role info
+        return new SpecialCollection<any, any>(null, null as any, null as any);;
         
         // these are also on the "override" list
         // case 'DMMessageManager' as any:

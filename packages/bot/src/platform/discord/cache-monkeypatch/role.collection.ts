@@ -1,6 +1,7 @@
 import { Newable } from "@common/util/types/utility-types";
+import { ObjectCollection } from "@root/platform/discord/cache-monkeypatch/obj.collection";
 import { GLOBAL_STATE } from "@root/platform/discord/global-state";
-import { Collection, LimitedCollection, LimitedCollectionOptions, Role } from "discord.js";
+import { Channel, Collection, Guild, GuildMember, LimitedCollection, LimitedCollectionOptions, Role } from "discord.js";
 import { pick } from "lodash";
 
 
@@ -23,10 +24,16 @@ export class SpecialLimitedCollection<Key, Value> extends LimitedCollection<Key,
     return super.set(key, value);
   }
 }
-export class SpecialCollection<Key, Value> extends Collection<Key, Value> {
+
+export interface KeepMapFunction<Value> {
+  storeFn: (v: Value) => Partial<Value>,
+  keepFn?: (v: Value) => boolean,
+}
+export class SpecialCollection<Key extends string | number | symbol, Value> extends Collection<Key, Value> {
   constructor(
     public keyType: Key & Newable<any>,
-    public holdsType: Value & Newable<any>,
+    public holdsType: Value & Newable<Value>,
+    public config?: KeepMapFunction<Value>,
     iterable?: Iterable<readonly [Key, Value]>
   ) {
     super(iterable);
@@ -37,36 +44,83 @@ export class SpecialCollection<Key, Value> extends Collection<Key, Value> {
   public get whatAreMyKeys(): Key & Newable<any> { return this.keyType ?? this.firstKey()?.constructor; }
 
   public set(key: Key, value: Value): this {
-    const res = super.set(key, value);
+    const shouldKeep = this.config?.keepFn?.(value) ?? true;
+    if (!shouldKeep) return this;
+    const keepPart = this.config?.storeFn?.(value) ?? value;
+    const res = super.set(key, keepPart as Value);
     GLOBAL_STATE.isAfterStartup && console.debug('set', key, '->', value?.constructor, 'up to', this.size);
     return res;
   }
 }
 
-export class RoleCollection<Key> extends SpecialCollection<Key, Role> {
+export class RoleCollection<Key extends string | number | symbol> extends SpecialCollection<Key, Role> {
+  static CONFIG: KeepMapFunction<Role> =  {
+    keepFn: (value) => {
+      const isEveryone = value.name === '@everyone' || value.id === value?.guild?.id;
+      const isRollemRole = value.name.startsWith('rollem:prefix:')
+      return (isEveryone || isRollemRole);
+    },
+
+    storeFn: (value) => pick(value, ['id', 'name']) as Role
+  };
+
   constructor(
     keyType: Key & Newable<any>,
-    holdsType: Role & Newable<any>,
-    options: LimitedCollectionOptions<Key, Role>,
+    holdsType: any,
+    options?: LimitedCollectionOptions<Key, Role>,
     iterable?: Iterable<readonly [Key, Role]>
   ) {
-    super(keyType, holdsType, iterable);
+    super(keyType, holdsType, RoleCollection.CONFIG, iterable);
   }
+}
 
-  public set(key: Key, value: Role): this {
-    // console.debug("Want to Set", key, "->", {
-    //   role: {
-    //     name: value?.name,
-    //     id: value?.id,
-    //   },
-    //   guild: {
-    //     name: value?.guild?.name,
-    //     id: value?.guild?.id,
-    //   },
-    // });
-    const isEveryone = value.name === '@everyone' || value.id === value?.guild?.id;
-    const isRollemRole = value.name.startsWith('rollem:prefix:')
-    if (!(isEveryone || isRollemRole)) return this;
-    return super.set(key, pick(value, ['id', 'name']) as Role);
+export class GuildCollection<Key extends string | number | symbol> extends SpecialCollection<Key, Guild> {
+  static CONFIG: KeepMapFunction<Guild> =  {
+    storeFn: (value) => pick(value, ['id', 'name']) as Partial<Guild>
+  };
+
+  constructor(
+    keyType: Key & Newable<any>,
+    holdsType: any,
+    options?: LimitedCollectionOptions<Key, Guild>,
+    iterable?: Iterable<readonly [Key, Guild]>
+  ) {
+    super(keyType, holdsType, GuildCollection.CONFIG, iterable);
+  }
+}
+
+export class ChannelCollection<Key extends string | number | symbol> extends SpecialCollection<Key, Channel> {
+  static CONFIG: KeepMapFunction<Channel> =  {
+    storeFn: (value) => value,
+    keepFn: (value) => {
+      return value.isTextBased();
+    }
+  };
+
+  constructor(
+    keyType: Key & Newable<any>,
+    holdsType: any,
+    options?: LimitedCollectionOptions<Key, Channel>,
+    iterable?: Iterable<readonly [Key, Channel]>
+  ) {
+    super(keyType, holdsType, ChannelCollection.CONFIG, iterable);
+  }
+}
+
+export class GuildMemberCollection<Key extends string | number | symbol> extends SpecialCollection<Key, GuildMember> {
+  static CONFIG: KeepMapFunction<GuildMember> =  {
+    storeFn: (value) => value,
+    keepFn: (value) => {
+      return value.id == value.client.user.id;
+    }
+  };
+
+  constructor(
+    keyType: Key & Newable<any>,
+    holdsType: any,
+    options?: LimitedCollectionOptions<Key, GuildMember>,
+    iterable?: Iterable<readonly [Key, GuildMember]>
+  ) {
+    super(keyType, holdsType, GuildMemberCollection.CONFIG, iterable);
   }
 }
