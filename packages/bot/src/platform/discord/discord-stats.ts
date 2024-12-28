@@ -6,6 +6,7 @@ import { Client } from "discord.js";
 import { Injectable } from "injection-js";
 import moment from "moment";
 import { Gauge } from "prom-client";
+import { ENV_CONFIG } from "@root/platform/env-config.service";
 
 export interface DiscordRawBotStats {
   shard?: string,
@@ -107,7 +108,7 @@ export class DiscordStats extends BehaviorStatsBase {
     const uptime = moment.duration(this.client.uptime);
 
     return {
-      shard: this.logger.shardName(),
+      shard: ENV_CONFIG.shardSetInfo.name,
       uptime,
       servers: this.client.guilds.cache.size,
       users: this.client.users.cache.size,

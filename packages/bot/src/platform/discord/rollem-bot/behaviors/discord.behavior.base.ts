@@ -1,10 +1,10 @@
 import { Client } from "discord.js";
-import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { ClassProvider, Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { Newable } from "@common/util/types/utility-types";
 import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
 import { IInitializeable } from "@common/util/injector-wrapper";
+import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 
 /** A base for behaviors to be applied to a discord client. */
 @Injectable()

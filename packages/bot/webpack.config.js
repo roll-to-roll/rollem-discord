@@ -8,10 +8,10 @@ const config = {
       import: './src/entrypoint.ts',
       filename: "bundle.js",
     },
-    entrypointSingleShard: {
-      import: './src/entrypoint-single-shard.ts',
-      filename: "bundle-single-shard.js",
-    },
+    // entrypointSingleShard: {
+    //   import: './src/entrypoint-single-shard.ts',
+    //   filename: "bundle-single-shard.js",
+    // },
   },
   target: 'node',
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
@@ -23,6 +23,9 @@ const config = {
   ],
   plugins: [
     // TODO: I'm not sure why all these are showing up here, since I thought they'd be already excluded from the dependencies list by the bundling?
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/exporter-trace-otlp-grpc$/}), // typeorm peer dependency
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/exporter-logs-otlp-grpc$/}), // typeorm peer dependency
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/exporter-logs-otlp-grpc$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^pg-native$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^react-native-sqlite-storage$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^mysql$/}), // typeorm peer dependency
@@ -50,7 +53,6 @@ const config = {
     // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/api$/ }), // ???
     // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/sdk-trace-base$/ }), // ???
     // new IgnorePlugin({ resourceRegExp: /^@azure\/functions-core$/ }), // ???
-    // new IgnorePlugin({ resourceRegExp: /^applicationinsights-native-metrics$/ }), // ???
     // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/winston-transport$/}), // peer dependency
     // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/exporter-jaeger$/}), // peer dependency
   ],

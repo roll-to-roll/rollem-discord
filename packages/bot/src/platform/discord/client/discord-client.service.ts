@@ -1,16 +1,21 @@
-import { Inject, Injectable } from "injection-js";
+import { Injectable } from "injection-js";
 import { ClientConfigService } from "./client-config.service";
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
-import { BitFieldResolvable, Client, ClientOptions, GatewayIntentsString, IntentsBitField, Partials } from "discord.js";
-import { defaults } from "lodash";
+import { Client, version } from "discord.js";
 import { IInitializeable } from "@common/util/injector-wrapper";
 import { OriginalConfig } from "@root/platform/original-config.service";
-import { DiscordBehaviorBase } from "@bot/behaviors/discord.behavior.base";
 import { GLOBAL_STATE } from "@root/platform/discord/global-app-state";
+import { DiscordClientWithTelemetry } from "@root/platform/discord/client/discord-client-with-telemetry";
+import { trace } from "@opentelemetry/api";
+
+const tracer = trace.getTracer(
+  'discord-client.service',
+  version,
+)
 
 @Injectable()
 export class DiscordClientService implements IInitializeable {
-  public client: Client<boolean>;
+  public client: DiscordClientWithTelemetry;
 
   constructor(
     private readonly logger: Logger,
@@ -24,15 +29,17 @@ export class DiscordClientService implements IInitializeable {
     // logger.trackSimpleEvent(LoggerCategory.SystemEvent, "Logging in using token: " + config.Token);
 
     console.debug("ClientOptions", options);
-    this.client = new Client(options);
+    this.client = new DiscordClientWithTelemetry(options);
   }
 
   public async initialize(): Promise<void> {
-    this.client.on('debug', m => console.debug(m));
-    this.client.on('ready', c => {
-      console.debug("======================================== READY ========================================");
-      GLOBAL_STATE.isAfterClientReady = true;
+    await tracer.startActiveSpan('login', async span => {
+      this.client.on('debug', m => console.debug(m));
+      this.client.on('ready', c => {
+        console.debug("======================================== READY ========================================");
+        GLOBAL_STATE.isAfterClientReady = true;
+      });
+      await this.client.login(this.envConfig.Token);
     });
-    await this.client.login(this.envConfig.Token);
   }
 }

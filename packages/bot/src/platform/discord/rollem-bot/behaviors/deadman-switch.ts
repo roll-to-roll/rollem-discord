@@ -6,6 +6,7 @@ import { Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { OriginalConfig } from "@root/platform/original-config.service";
 import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
+import { ENV_CONFIG } from "@root/platform/env-config.service";
 
 // TODO: there's got to be a cleaner way to handle this, but this seems to make it more resilient.
 
@@ -79,7 +80,7 @@ export class DeadmanSwitchBehavior extends DiscordBehaviorBase {
         try {
           botOwner = await this.client.users.fetch("105641015943135232"); // this is me. i couldn't message the bot itself.
           const diagnosticMode = this.config.inLocalDiagnosticMode ? "__**`[DIAGNOSTIC]`**__ " : "";
-          message = await botOwner.send(`${diagnosticMode}shard '${this.logger.shardName()}' - ready ${counter}`) as Message;
+          message = await botOwner.send(`${diagnosticMode}shard '${ENV_CONFIG.shardSetInfo.name}' - ready ${counter}`) as Message;
         } catch {
           await promisify(setTimeout)(DeadmanSwitchBehavior.TimeWindowDuration / 3);
         }

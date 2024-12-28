@@ -7,6 +7,7 @@ import moment from "moment";
 import { Injectable } from "injection-js";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
+import { ENV_CONFIG } from "@root/platform/env-config.service";
 
 /**
  * Initializes the system after login and starts the heartbeat.
@@ -64,6 +65,6 @@ export class HeartbeatBehavior extends DiscordBehaviorBase {
     const disableHeartbeat = process.env.DISABLE_HEARTBEAT
     if (disableHeartbeat) { return; }
 
-    this.logger.trackSimpleEvent(LoggerCategory.SystemActivity, `heartbeat - shard ${this.logger.shardName()}`, {reason: reason});
+    this.logger.trackSimpleEvent(LoggerCategory.SystemActivity, `heartbeat - shard - ${ENV_CONFIG.shardSetInfo.name}`, {reason: reason});
   }
 }

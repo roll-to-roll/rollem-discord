@@ -43,7 +43,6 @@ module.exports = {
     new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/api$/ }), // ???
     new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/sdk-trace-base$/ }), // ???
     new IgnorePlugin({ resourceRegExp: /^@azure\/functions-core$/ }), // ???
-    new IgnorePlugin({ resourceRegExp: /^applicationinsights-native-metrics$/ }), // ???
   ],
   output: {
     path: path.resolve(__dirname, '../dist/umd'),

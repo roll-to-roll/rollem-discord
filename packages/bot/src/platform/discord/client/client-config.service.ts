@@ -13,6 +13,7 @@ import { ChannelCollection } from "./cache/collections/channel.collection";
 import { GuildCollection } from "./cache/collections/guild.collection";
 import { SpecialCollection } from "./cache/base-collections/special-collection";
 import { CacheService } from "@root/platform/discord/client/cache/cache.service";
+import { ENV_CONFIG } from "@root/platform/env-config.service";
 
 /** Coordinates selection and construction of {@link ClientOptions} for {@link Client}. */
 @Injectable()
@@ -34,7 +35,7 @@ export class ClientConfigService implements IInitializeable {
     await this.config.initialize();
     
     this.botInfo = await fetchGatewayBotInfo(this.config.Token);
-    this.grouping = groupShardsByRateLimitKey(this.botInfo, { forceShardCount: this.config.forcedShardCount });
+    this.grouping = groupShardsByRateLimitKey(this.botInfo, { forceShardCount: ENV_CONFIG.shardSetInfo.totalShards });
     this.ourBucket = this.grouping.noRateLimitBuckets[0];
   }
 

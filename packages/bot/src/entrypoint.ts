@@ -1,5 +1,6 @@
 // these must be the first imported items
 import "reflect-metadata";
+import { TelemetryService } from "@common/services/logger.service/telemetry.service";
 import nodeFetch from 'node-fetch';
 import util from 'util';
 global.fetch = nodeFetch as any;
@@ -46,7 +47,6 @@ import { humanizeMillisForDebug } from "@common/util/humanize-duration";
 import { CacheService } from "@root/platform/discord/client/cache/cache.service";
 import { GlobalAppState } from "@root/platform/discord/global-app-state";
 import { EnvConfig } from "@root/platform/env-config.service";
-import { AppInsightsService } from "@common/services/logger.service/appinsights.logger";
 
 const ORDERED_STANDARD_BEHAVIORS: Newable<BehaviorBase>[] = [
   PingPongBehavior,
@@ -72,7 +72,7 @@ const ORDERED_DISCORD_BEHAVIORS: ClassProvider[] = [
 async function doInit() {
   const topLevelScope = await InjectorWrapper.createTopLevelContext([
     ...EnvConfig.providers,
-    ...AppInsightsService.providers,
+    TelemetryService,
     PromLogger,
     // PromLoggerApi,
     Logger,

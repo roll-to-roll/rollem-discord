@@ -2,10 +2,6 @@
 // on conditional subtypes https://medium.com/dailyjs/typescript-create-a-condition-based-subset-types-9d902cea5b8c
 // on readonly detection https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir
 
-
-
-import { Base } from "applicationinsights/out/Declarations/Contracts";
-
 /** For generating parameter types for containers. */
 export type ParamType<T> = Omit<ExceptOfType<T, Function>, "depth" | "dice">;
 

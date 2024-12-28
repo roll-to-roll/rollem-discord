@@ -1,67 +1,49 @@
 import { IInitializeable } from "@common/util/injector-wrapper";
+import { ENV_CONFIG } from "@root/platform/env-config.service";
 import { Injectable } from "injection-js";
 
 /** Loads and stores various configuration values. @deprecated */
 @Injectable()
 export class OriginalConfig implements IInitializeable {
-  /** The ID of this shard. Must be below @see ShardCount. */
-  public readonly forcedShardCount = process.env.DISCORD_BOT_FORCED_SHARD_COUNT ? +process.env.DISCORD_BOT_FORCED_SHARD_COUNT : undefined;
+  /** The ID of this shard. Must be below @see ShardCount. @deprecated */
+  public readonly ShardId = ENV_CONFIG.shardSetInfo.index;
 
-  /** The ID of this shard. Must be below @see ShardCount. */
-  public readonly ShardId = process.env.DISCORD_BOT_SHARD_ID ? +process.env.DISCORD_BOT_SHARD_ID : undefined;
-
-  /** The number of shards. */
-  public readonly ShardCount = process.env.DISCORD_BOT_SHARD_COUNT ? +process.env.DISCORD_BOT_SHARD_COUNT : undefined;
-
-  /** True if the config has all needed shard info. */
-  public readonly HasShardInfo = this.ShardId != undefined && this.ShardCount != undefined;
+  /** The number of shards. @deprecated */
+  public readonly ShardCount = ENV_CONFIG.shardSetInfo.setCount;
 
   public initialize(): Promise<void> {
     return Promise.resolve();
   }
 
-  /** Gets a machine-ready shard label. */
+  /** Gets a machine-ready shard label. @deprecated */
   public get ShardLabel(): string {
-    if (this.ShardId !== undefined && this.ShardCount !== undefined) {
-      return `${this.ShardId+1}-of-${this.ShardCount}`
-    } else {
-      return '1-of-1';
-    }
+    return ENV_CONFIG.openTelemetry.ServiceInstanceId;
   }
 
-  /** Gets a human-readable shard label */
+  /** Gets a human-readable shard label @deprecated */
   public get ShardName(): string {
-    if (this.ShardId !== undefined && this.ShardCount !== undefined) {
-      return `${this.ShardId+1} of ${this.ShardCount}`
-    } else {
-      return 'only';
-    }
+    return ENV_CONFIG.shardSetInfo.name
   }
 
-  /** When true, indicates Rollem should launch in a local diagnostic mode, and not send any replies. */
+  /** When true, indicates Rollem should launch in a local diagnostic mode, and not send any replies. @deprecated */
   public get inLocalDiagnosticMode(): boolean {
-    return (process.env.ROLLEM_LOCAL_DIAGNOSTIC_MODE ?? "false").toLowerCase() === "true";
+    return ENV_CONFIG.behaviorConfig.diagnosticMode;
   }
 
-  /** The user token for Discord. */
+  /** The user token for Discord. @deprecated */
   public get Token(): string {
-    var token = process.env.DISCORD_BOT_USER_TOKEN;
-    if (!token) {
-      throw new Error("DISCORD_BOT_USER_TOKEN not set");
-    }
-
-    return token;
+    return ENV_CONFIG.secrets.discordToken;
   }
 
-  /** The client IDs to defer to. If any of these clients are present in a channel, do not respond. */
-  public readonly deferToClientIds = (process.env.DEFER_TO_CLIENT_IDS || '').split(',');
+  /** The client IDs to defer to. If any of these clients are present in a channel, do not respond. @deprecated */
+  public readonly deferToClientIds = ENV_CONFIG.behaviorConfig.deferToBotClientIds;
 
-  /** The AI Connection String. */
-  public readonly AppInsightsConnectionString = process.env.APPINSIGHTS_CONNECTIONSTRING;
+  /** The AI Connection String. @deprecated */
+  public readonly AppInsightsConnectionString = ENV_CONFIG.secrets.appInsightsConnectionString;
 
-  /** The regex to be used to determine if the bot was mentioned. Updated after login. <@!...> means the message was tab-completed, <@...> means it was typed manually and inferred. */
+  /** The regex to be used to determine if the bot was mentioned. Updated after login. <@!...> means the message was tab-completed, <@...> means it was typed manually and inferred. @deprecated */
   public mentionRegex: RegExp = /$<@!999999999999999999>|<@999999999999999999>/i;
 
-  /** The interval between updating the "Now Playing" message under the bot. */
+  /** The interval between updating the "Now Playing" message under the bot. @deprecated */
   public readonly messageInterval = 59 * 1000; // every minute (less a bit, so it will trigger other "every minute" monitors)
 }
