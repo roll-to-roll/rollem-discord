@@ -13,6 +13,7 @@ import { ConsoleMetricExporter, MeterProvider, PeriodicExportingMetricReader } f
 import { BatchLogRecordProcessor, ConsoleLogRecordExporter, LoggerProvider, SimpleLogRecordProcessor } from '@opentelemetry/sdk-logs';
 import { AsyncLocalStorageContextManager } from "@opentelemetry/context-async-hooks";
 import { NodeSDK, NodeSDKConfiguration, metrics } from "@opentelemetry/sdk-node";
+
 import { THROW } from '@common/errors/do-error';
 import { logs } from '@opentelemetry/api-logs';
 
@@ -31,26 +32,19 @@ const resource = new Resource({
   [SEMRESATTRS_SERVICE_INSTANCE_ID]: ENV_CONFIG.openTelemetry.ServiceInstanceId,
 });
 
-const loggerProvider = new LoggerProvider({ resource });
-loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(new AzureMonitorLogExporter(azureMonitorOptions)));
-loggerProvider.addLogRecordProcessor(new SimpleLogRecordProcessor(new ConsoleLogRecordExporter()));
-
-const meterProvider = new MeterProvider({
-  resource,
-  readers: [
-    new PeriodicExportingMetricReader({ exporter: new AzureMonitorMetricExporter(azureMonitorOptions)}),
-    new PeriodicExportingMetricReader({ exporter: new ConsoleMetricExporter() }),
-  ]
-});
-
-logs.setGlobalLoggerProvider(loggerProvider);
-api.metrics.setGlobalMeterProvider(meterProvider) || THROW(new Error("NOPE"));
-
 // TODO: Common setup?
 const sdkConfig: Partial<NodeSDKConfiguration> = {
   resource: resource,
-  spanProcessors: [ new SimpleSpanProcessor(new ConsoleSpanExporter()) ],
-  
+  spanProcessors: [
+    new BatchSpanProcessor(new AzureMonitorTraceExporter(azureMonitorOptions), { exportTimeoutMillis: 15000, maxExportBatchSize: 1000, }),
+    new SimpleSpanProcessor(new ConsoleSpanExporter()),
+  ],
+  metricReader:  new PeriodicExportingMetricReader({ exporter: new AzureMonitorMetricExporter(azureMonitorOptions)}),
+  logRecordProcessors: [
+    new BatchLogRecordProcessor(new AzureMonitorLogExporter(azureMonitorOptions)),
+    new SimpleLogRecordProcessor(new ConsoleLogRecordExporter()),
+  ],
+  instrumentations: [],
 };
 const sdk = new NodeSDK(sdkConfig);
 sdk.start();
@@ -75,14 +69,14 @@ api.context.setGlobalContextManager(contextManager);
 // // useAzureMonitor(options);
 
 // traces
-const aiTracer = new NodeTracerProvider({
-  resource,
-  sampler: new ApplicationInsightsSampler(0),
-  spanProcessors: [
-    new BatchSpanProcessor(new AzureMonitorTraceExporter(azureMonitorOptions), { exportTimeoutMillis: 15000, maxExportBatchSize: 1000, }),
-  ]
-});
-aiTracer.register({ contextManager });
+// const aiTracer = new NodeTracerProvider({
+//   resource,
+//   sampler: new ApplicationInsightsSampler(0),
+//   spanProcessors: [
+//     new BatchSpanProcessor(new AzureMonitorTraceExporter(azureMonitorOptions), { exportTimeoutMillis: 15000, maxExportBatchSize: 1000, }),
+//   ]
+// });
+// aiTracer.register({ contextManager });
 
 
 /** Telemetry Context fields. */
