@@ -29,13 +29,16 @@ export class Logger {
         console.log("Configuring Application Insights");
         // TODO: This reads all log messages from console. We can probably do better by logging via winston/bunyan.
         appInsights.setup(config.AppInsightsConnectionString)
-          .setAutoDependencyCorrelation(true)
-          .setAutoCollectRequests(true)
-          .setAutoCollectPerformance(true)
-          .setAutoCollectExceptions(true)
+          .setAutoCollectConsole(false)
           .setAutoCollectDependencies(false)
-          .setAutoCollectConsole(true, true)
-          .setUseDiskRetryCaching(true)
+          .setAutoCollectExceptions(false)
+          .setAutoCollectHeartbeat(true)            // will likely be a useful metric
+          .setAutoCollectIncomingRequestAzureFunctions(false)
+          .setAutoCollectPerformance(true, false)   // will likely be a useful metric
+          .setAutoCollectPreAggregatedMetrics(true) // reduces cost
+          .setAutoCollectRequests(false)
+          .enableWebInstrumentation(false)
+          .setSendLiveMetrics(true)
           .start();
       } catch (ex) {
         try {

@@ -1,7 +1,7 @@
 import { IInitializeable } from "@common/util/injector-wrapper";
 import { Injectable } from "injection-js";
 
-/** Loads and stores various configuration values. */
+/** Loads and stores various configuration values. @deprecated */
 @Injectable()
 export class OriginalConfig implements IInitializeable {
   /** The ID of this shard. Must be below @see ShardCount. */

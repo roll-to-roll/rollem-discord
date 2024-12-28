@@ -18,6 +18,7 @@ const config = {
   ignoreWarnings: [
     { message: /the request of a dependency is an expression/, }, // TypeORM spams these
     { message: /supports-color.*?a peer dependency/ }, // I blame TypeORM 
+    { message: /Can't resolve '.*?opentelemetry.*?'/ }, // https://github.com/open-telemetry/opentelemetry-js/issues/4434
     { message: /tried to access .*?\(a peer dependency\) but it isn't provided by its ancestors/ }, // Appears to be a Yarn Berry bug https://github.com/yarnpkg/berry/issues/5153
   ],
   plugins: [
@@ -44,12 +45,14 @@ const config = {
     new IgnorePlugin({ resourceRegExp: /^stack-chain$/, contextRegExp: /cls-hooked/ }), // cls-hooked dependency
     new IgnorePlugin({ resourceRegExp: /^bufferutil$/ }), // ws peer dependency
     new IgnorePlugin({ resourceRegExp: /^utf-8-validate$/ }), // ws peer dependency
-    new IgnorePlugin({ resourceRegExp: /^@azure\/opentelemetry-instrumentation-azure-sdk$/ }), // ws peer dependency
-    new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/instrumentation$/ }), // ???
-    new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/api$/ }), // ???
-    new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/sdk-trace-base$/ }), // ???
-    new IgnorePlugin({ resourceRegExp: /^@azure\/functions-core$/ }), // ???
-    new IgnorePlugin({ resourceRegExp: /^applicationinsights-native-metrics$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@azure\/opentelemetry-instrumentation-azure-sdk$/ }), // ws peer dependency
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/instrumentation$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/api$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/sdk-trace-base$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@azure\/functions-core$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^applicationinsights-native-metrics$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/winston-transport$/}), // peer dependency
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/exporter-jaeger$/}), // peer dependency
   ],
   node: {
     global: true,
@@ -71,7 +74,7 @@ const config = {
     ],
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js", ".pegjs"],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', ".pegjs"],
     alias: {
       "@bot": path.resolve(__dirname, "src/platform/discord/rollem-bot/"),
       "@common": path.resolve(__dirname, "src/common/"),

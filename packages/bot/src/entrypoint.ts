@@ -45,6 +45,8 @@ import { humanizeInteger } from "@common/util/number-with-commas";
 import { humanizeMillisForDebug } from "@common/util/humanize-duration";
 import { CacheService } from "@root/platform/discord/client/cache/cache.service";
 import { GlobalAppState } from "@root/platform/discord/global-app-state";
+import { EnvConfig } from "@root/platform/env-config.service";
+import { AppInsightsService } from "@common/services/logger.service/appinsights.logger";
 
 const ORDERED_STANDARD_BEHAVIORS: Newable<BehaviorBase>[] = [
   PingPongBehavior,
@@ -69,6 +71,8 @@ const ORDERED_DISCORD_BEHAVIORS: ClassProvider[] = [
 
 async function doInit() {
   const topLevelScope = await InjectorWrapper.createTopLevelContext([
+    ...EnvConfig.providers,
+    ...AppInsightsService.providers,
     PromLogger,
     // PromLoggerApi,
     Logger,
