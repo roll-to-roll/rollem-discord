@@ -4,33 +4,76 @@ import { RollemContext } from "@common/services/logger.service/open-telemetry/pr
 import { BorgName } from "@common/util/borg-designation";
 import { Context, SpanKind, SpanStatusCode, context, trace } from "@opentelemetry/api";
 import { ENV_CONFIG } from "@root/platform/env-config.service";
-import { Awaitable, Client, ClientEvents, ClientOptions, version } from "discord.js";
+import { Awaitable, Client, ClientEvents, ClientOptions, Collection, version } from "discord.js";
 
 const tracer = OTel.api.trace.getTracer(
   'discord-client|all',
   version,
 );
 
+export type ListenerFunc<TEvent extends keyof ClientEvents = keyof ClientEvents> = (...args: ClientEvents[TEvent]) => Awaitable<void>;
+
 export class DiscordClientWithTelemetry extends Client<boolean> {
-  public on<TEvent extends keyof ClientEvents>(event: TEvent, listener: (...args: ClientEvents[TEvent]) => Awaitable<void>): this {
-    // return super.on(event, async (...args: ClientEvents[TEvent]) => {
-    //   const ctx = this.createContext(context.active(), event, ...args);
-    //   await context.with(ctx, async () => {
-    //     await tracer.startActiveSpan(`on(${event})`, { kind: SpanKind.SERVER, root: true }, async span => {
-    //       await listener(...args);
-    //       span.setStatus({ code: SpanStatusCode.OK, message: "done?" }).end();
-    //     });
-    //   })
-    // });
-    return super.on(event, async (...args: ClientEvents[TEvent]) => {
-      await tracer.startActiveSpan(
-        `on(${event})`, { kind: SpanKind.SERVER, root: true },
-        this.createContext(event, ...args),
-        async span => {
-        await listener(...args);
-        span.setStatus({ code: SpanStatusCode.OK, message: "done?" }).end();
-      });
+  private _root?: Collection<keyof ClientEvents, ListenerFunc<any>>;
+
+  private _registered?: Collection<keyof ClientEvents, Collection<ListenerFunc<any>, true>>;
+
+  public constructor(options: ClientOptions) {
+    super(options);
+  }
+
+  public get root() {
+    return (this._root ??= new Collection<keyof ClientEvents, ListenerFunc<any>>());
+  }
+
+  public get registered() {
+    return (this._registered ??= new Collection<keyof ClientEvents, Collection<ListenerFunc<any>, true>>());
+  }
+
+  public on<TEvent extends keyof ClientEvents>(event: TEvent, listener: ListenerFunc<TEvent>): this {
+    if (!this.root) { debugger; }
+    this.root.ensure(event, (_key, _coll) => {
+      const rootEventFn = async (...args: ClientEvents[TEvent]) => await this.onInternalRoot(event, ...args);
+      super.on(event, rootEventFn);
+      return rootEventFn;
     });
+
+    this.registered
+      .ensure(event, (_key, _coll) => new Collection<ListenerFunc<TEvent>, true>())
+      .set(listener, true);
+
+    return this;
+  }
+
+  private async onInternalRoot<TEvent extends keyof ClientEvents>(event: TEvent, ...args: ClientEvents[TEvent]): Promise<void> {
+    await tracer.startActiveSpan(`on(${event})`, { kind: SpanKind.SERVER, root: true }, this.createContext(event, ...args),
+      async (span) => {
+        const listeners = [...this.registered.get(event)?.keys() ?? []];
+        const promises = listeners.map(listener => this.onInternalEach(listener, event, ...args));
+        const result = await Promise.allSettled(promises);
+        const allGood = result.every(r => r.status == "fulfilled");
+        const finalStatus = allGood ? SpanStatusCode.OK : SpanStatusCode.ERROR;
+        span.setStatus({ code: finalStatus }).end();
+      });
+  }
+
+  private async onInternalEach<TEvent extends keyof ClientEvents>(listener: ListenerFunc<TEvent>, event: TEvent, ...args: ClientEvents[TEvent]): Promise<void> {
+    await tracer.startActiveSpan(`on(${event})`, { kind: SpanKind.INTERNAL }, this.createContext(event, ...args),
+      async (span) => {
+        try {
+          await listener(...args);
+          span.setStatus({ code: SpanStatusCode.OK });
+        }
+        catch (e: unknown) {
+          if (e instanceof Error) { 
+            span.recordException(e);
+          }
+          span.setStatus({ code: SpanStatusCode.ERROR });
+        }
+        finally {
+          span.end();
+        }
+      });
   }
 
   private createContext<TEvent extends keyof ClientEvents>(event: TEvent, ...args: ClientEvents[TEvent]): Context {
@@ -38,6 +81,8 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
       case 'messageCreate':
         const message = (args as ClientEvents['messageCreate'])?.[0];
         return RollemContext.set({
+          isBot: message.author.bot,
+          isRollem: message.author.id === this.application?.client.user.id,
           message: message.id,
           author: message.author.id,
           channel: message.channelId,

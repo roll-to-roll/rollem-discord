@@ -1,4 +1,4 @@
-import { Context, Span } from "@opentelemetry/api";
+import { Context, Span, TraceFlags } from "@opentelemetry/api";
 import { ReadableSpan, SpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { chain, cloneDeep, fromPairs } from "lodash";
 import { OTel_Processor_Bundle, OTel_Processor_Source } from "@common/services/logger.service/open-telemetry/processor.base";
@@ -7,20 +7,23 @@ import { api } from "@opentelemetry/sdk-node";
 import { THROW } from "@common/errors/do-error";
 import { RollemError } from "@common/errors";
 
+export interface RollemContextInterface {
+  isBot?: boolean,
+  isRollem?: boolean,
+  shardSet?: string,
+  shard?: string,
+  guild?: string,
+  channel?: string,
+  message?: string,
+  author?: string,
+  event?: string,
+}
 
 export class RollemContext {
   public static ROLLEM = api.createContextKey('djs-rollem');
 
   constructor(
-    public readonly djs: {
-      shardSet?: string,
-      shard?: string,
-      guild?: string,
-      channel?: string,
-      message?: string,
-      author?: string,
-      event?: string,
-    }
+    public readonly djs: RollemContextInterface,
   ) {}
 
   public static isRollemContext(item: unknown): item is RollemContext {
@@ -29,7 +32,7 @@ export class RollemContext {
     return false;
   }
 
-  public static set(initialVals: RollemContext['djs'], context: api.Context = api.context.active()): api.Context {
+  public static set(initialVals: RollemContextInterface, context: api.Context = api.context.active()): api.Context {
     return context.setValue(this.ROLLEM, new RollemContext(cloneDeep(initialVals)));
   }
 
@@ -44,14 +47,30 @@ export class RollemContext {
   } 
 }
 
-class PutBaggageOnTheSpans implements SpanProcessor {
+class PutRollemContextOnTheSpans implements SpanProcessor {
   constructor() {}
   async forceFlush(): Promise<void> {}
   onEnd(_: ReadableSpan): void {}
   async shutdown(): Promise<void> {}
   
   onStart(span: Span, parentContext: Context): void {
+    const context = span.spanContext();
     const rollemContext = RollemContext.get(parentContext);
+    let shouldKeep = true;
+    if (!!rollemContext?.djs) {
+      if (rollemContext.djs.isRollem) {
+        shouldKeep = false;
+      }
+
+      if (rollemContext.djs.isBot) {
+        shouldKeep = false;
+      }
+    }
+
+    if (!shouldKeep) {
+      context.traceFlags = TraceFlags.NONE;
+    }
+
     const definedPairs = chain(rollemContext?.djs).toPairs().filter(([k, v]) => v != undefined).fromPairs().value()
     span.setAttributes(definedPairs);
   }
@@ -59,15 +78,11 @@ class PutBaggageOnTheSpans implements SpanProcessor {
 
 /** Generates unified config for AzureMonitor. */
 export class OTel_Initializer_Baggage extends OTel_Processor_Source<typeof OTel_Initializer_Baggage> {
-
-  constructor(
-  ) { super(); }
-
   /** Generates new exporters based on current settings. */
   public makeExporters(): OTel_Processor_Bundle {
     return {
       metrics: [], // [new PeriodicExportingMetricReader({ exporter: new ConsoleMetricExporter() })],
-      tracer: [new PutBaggageOnTheSpans()],
+      tracer: [new PutRollemContextOnTheSpans()],
       logs: [], // [new SimpleLogRecordProcessor(new ConsoleLogRecordExporter())],
     };
   };
