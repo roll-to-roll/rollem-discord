@@ -24,6 +24,8 @@ const azureMonitorOptions: AzureMonitorExporterOptions = {
   storageDirectory: './azure-monitor-logs/',
 };
 
+const contextManager = new AsyncLocalStorageContextManager();
+contextManager.enable();
 
 const resource = new Resource({
   [ATTR_SERVICE_NAME]: ENV_CONFIG.openTelemetry.serviceName,
@@ -35,6 +37,7 @@ const resource = new Resource({
 // TODO: Common setup?
 const sdkConfig: Partial<NodeSDKConfiguration> = {
   resource: resource,
+  contextManager,
   spanProcessors: [
     new BatchSpanProcessor(new AzureMonitorTraceExporter(azureMonitorOptions), { exportTimeoutMillis: 15000, maxExportBatchSize: 1000, }),
     new SimpleSpanProcessor(new ConsoleSpanExporter()),
@@ -50,9 +53,9 @@ const sdk = new NodeSDK(sdkConfig);
 sdk.start();
 
 // TODO: Common setup?
-const contextManager = new AsyncLocalStorageContextManager();
-contextManager.enable();
-api.context.setGlobalContextManager(contextManager);
+// const contextManager = new AsyncLocalStorageContextManager();
+// contextManager.enable();
+// api.context.setGlobalContextManager(contextManager);
 
 // // // wiring up azure monitor
 // // const options: AzureMonitorOpenTelemetryOptions = {
