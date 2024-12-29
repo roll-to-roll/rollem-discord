@@ -1,12 +1,12 @@
 import { AzureMonitorExporterOptions, AzureMonitorLogExporter, AzureMonitorMetricExporter, AzureMonitorTraceExporter } from "@azure/monitor-opentelemetry-exporter";
-import { OTel_Processor_ExporterBundle, OTel_Processor_Source } from "@common/services/logger.service/open-telemetry/common/exporter-base";
+import { OTel_Processor_Bundle, OTel_Processor_Source } from "../../processor.base";
 import { BatchLogRecordProcessor, BufferConfig as LogsBufferConfig } from "@opentelemetry/sdk-logs";
-import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { BatchSpanProcessor, BufferConfig as TraceBufferConfig } from "@opentelemetry/sdk-trace-base";
+import { PeriodicExportingMetricReader } from "@opentelemetry/sdk-metrics";
 import { ENV_CONFIG } from "@root/platform/env-config.service";
 
 /** Generates unified config for AzureMonitor. */
-export class OTel_AzureMonitor extends OTel_Processor_Source<typeof OTel_AzureMonitor> {
+export class OTel_Exporter_AzureMonitor extends OTel_Processor_Source<typeof OTel_Exporter_AzureMonitor> {
   // static #instance?: OTel_AzureMonitor;
 
   // /** Configured instance (or default). Must `set` before ever retrieving to initialize custom from . */
@@ -38,7 +38,7 @@ export class OTel_AzureMonitor extends OTel_Processor_Source<typeof OTel_AzureMo
   ) { super(); }
 
   /** Generates new exporters based on current settings. */
-  public makeExporters(): OTel_Processor_ExporterBundle {
+  public makeExporters(): OTel_Processor_Bundle {
     return {
       metrics: [new PeriodicExportingMetricReader({ exporter: new AzureMonitorMetricExporter(this.exporterOptions) })],
       tracer: [new BatchSpanProcessor(new AzureMonitorTraceExporter(this.exporterOptions), this.traceBufferConfig)],

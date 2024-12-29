@@ -21,6 +21,11 @@ import { meterProvider } from '@common/services/logger.service/open-telemetry/in
 import { tracerProvider } from '@common/services/logger.service/open-telemetry/init.tracer';
 import { OTel } from '@common/services/logger.service/open-telemetry/config';
 import { contextManager } from '@common/services/logger.service/open-telemetry/init.context';
+import { baggageUtils } from '@opentelemetry/core';
+import { getActiveBaggage, getBaggage } from '@opentelemetry/api/build/src/baggage/context-helpers';
+import { getActiveSpan } from '@opentelemetry/api/build/src/trace/context-utils';
+import { RollemError } from '@common/errors';
+import { clone, cloneDeep } from 'lodash';
 
 
 // const azureMonitorOptions: AzureMonitorExporterOptions = {
@@ -66,6 +71,8 @@ import { contextManager } from '@common/services/logger.service/open-telemetry/i
 
 /** Telemetry Context fields. */
 export const CTX = {
+  ROLLEM: api.createContextKey('djs-rollem'),
+
   GUILD: api.createContextKey('djs-guild'),
   CHANNEL: api.createContextKey('djs-channel'),
   MESSAGE: api.createContextKey('djs-message'),
@@ -81,6 +88,7 @@ export class TelemetryService {
   public static meterProvider = meterProvider;
   public static traceProvider = tracerProvider;
   public static contextManager = contextManager;
-
   public static config = OTel;
+
+
 }

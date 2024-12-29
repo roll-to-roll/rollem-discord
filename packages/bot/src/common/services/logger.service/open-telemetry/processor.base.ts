@@ -1,12 +1,10 @@
 import { LogRecordProcessor } from "@opentelemetry/sdk-logs";
 import { MetricReader } from "@opentelemetry/sdk-metrics";
 import { SpanProcessor } from "@opentelemetry/sdk-trace-base";
-import { Type } from "injection-js";
-import { values, valuesIn } from "lodash";
-import { ConstructorDeclaration } from "typescript";
+import { valuesIn } from "lodash";
 
 /** A set of configured exporters. */
-export interface OTel_Processor_ExporterBundle {
+export interface OTel_Processor_Bundle {
   /** Exporter for metrics. */
   metrics: MetricReader[];
 
@@ -38,17 +36,17 @@ export function SingletonOrExisting<T>() {
   }
 }
 export abstract class OTel_Processor_Source<T extends (new () => InstanceType<T>)> extends SingletonOrExisting<OTel_Processor_Source<any>>() {
-  #existingExporters?: OTel_Processor_ExporterBundle;
+  #existingExporters?: OTel_Processor_Bundle;
 
   /** Generates a singleton set of exporters, then freezes this instance for further modification. */
-  public get exporters(): OTel_Processor_ExporterBundle {
+  public get exporters(): OTel_Processor_Bundle {
     this.#existingExporters ??= this.makeExporters();
     valuesIn(this).forEach(o => Object.freeze(o));
     return this.#existingExporters;
   }
 
   /** Generates exporters based on current configuration. */
-  public abstract makeExporters(): OTel_Processor_ExporterBundle;
+  public abstract makeExporters(): OTel_Processor_Bundle;
 }
 
 // type DefaultCtorAbstractPermissive<T extends abstract new (...args: any) => any> = T extends (abstract new () => InstanceType<T>) ? InstanceType<T> : never;

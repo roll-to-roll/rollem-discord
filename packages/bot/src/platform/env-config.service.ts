@@ -1,6 +1,7 @@
 import { RollemConfigError } from "@common/errors";
 import { THROW } from "@common/errors/do-error";
 import { RollemInitializerError } from "@common/errors/initializer-error";
+import { BorgName } from "@common/util/borg-designation";
 import { IInitializeable, RollemProvider } from "@common/util/injector-wrapper";
 import { Snowflake } from "discord.js";
 import { Injectable, Provider } from "injection-js";
@@ -106,11 +107,10 @@ export class EnvConfig implements IInitializeable {
       setCount: this.env.DISCORD_BOT_SHARDSET_COUNT,
       shardsPerSet: this.env.DISCORD_BOT_SHARDSET_SHARDS_PER_SET,
       totalShards: this.env.DISCORD_BOT_SHARDSET_COUNT * this.env.DISCORD_BOT_SHARDSET_SHARDS_PER_SET,
-      name: (
-        (this.env.DISCORD_BOT_SHARDSET_ID+1 === 1)
-        && (this.env.DISCORD_BOT_SHARDSET_COUNT === 1)
-        && (this.env.DISCORD_BOT_SHARDSET_SHARDS_PER_SET === 1)
-      ) ? 'only' : `${this.env.DISCORD_BOT_SHARDSET_ID+1}-of-${this.env.DISCORD_BOT_SHARDSET_COUNT} (x${this.env.DISCORD_BOT_SHARDSET_SHARDS_PER_SET})`
+      name: BorgName.indexOfCountForGroup(
+        this.env.DISCORD_BOT_SHARDSET_ID,
+        this.env.DISCORD_BOT_SHARDSET_COUNT,
+        this.env.DISCORD_BOT_SHARDSET_SHARDS_PER_SET),
     }
   }
 

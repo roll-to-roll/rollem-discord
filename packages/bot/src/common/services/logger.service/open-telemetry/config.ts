@@ -5,7 +5,7 @@ import {
   ATTR_SERVICE_VERSION,
   SEMRESATTRS_SERVICE_INSTANCE_ID,
 } from '@opentelemetry/semantic-conventions';
-import { metrics, trace } from "@opentelemetry/api";
+import { metrics, trace, context, propagation } from "@opentelemetry/api";
 import { logs } from "@opentelemetry/api-logs";
 
 export namespace OTel {
@@ -23,5 +23,24 @@ export namespace OTel {
     metrics: metrics,
     trace: trace,
     logs: logs,
+    context: context,
+    propagation: propagation,
   }
 }
+
+// const sdkConfig: Partial<NodeSDKConfiguration> = {
+//   resource: resource,
+//   contextManager,
+//   spanProcessors: [
+//     new BatchSpanProcessor(new AzureMonitorTraceExporter(azureMonitorOptions), { exportTimeoutMillis: 15000, maxExportBatchSize: 1000, }),
+//     new SimpleSpanProcessor(new ConsoleSpanExporter()),
+//   ],
+//   metricReader:  new PeriodicExportingMetricReader({ exporter: new AzureMonitorMetricExporter(azureMonitorOptions)}),
+//   logRecordProcessors: [
+//     new BatchLogRecordProcessor(new AzureMonitorLogExporter(azureMonitorOptions)),
+//     new SimpleLogRecordProcessor(new ConsoleLogRecordExporter()),
+//   ],
+//   instrumentations: [],
+// };
+// const sdk = new NodeSDK(sdkConfig);
+// sdk.start();
