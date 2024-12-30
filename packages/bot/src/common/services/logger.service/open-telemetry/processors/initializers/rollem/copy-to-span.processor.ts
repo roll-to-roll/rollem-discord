@@ -28,7 +28,12 @@ export class OTel_Processor_RollemContext_CopyToSpan implements SpanProcessor {
       context.traceFlags = TraceFlags.NONE;
     }
 
-    const definedPairs = chain(rollemContext?.djs).toPairs().filter(([k, v]) => v != undefined).fromPairs().value()
+    const definedPairs = chain(rollemContext?.djs)
+      .toPairs()
+      .map(([k, v]) => [`r.${k}`, v])
+      .filter(([k, v]) => v != undefined)
+      .fromPairs()
+      .value()
     span.setAttributes(definedPairs);
   }
 }

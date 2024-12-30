@@ -168,7 +168,7 @@ export class StandardAdapter extends DiscordBehaviorBase {
 
     // console.log({event: 'handleAll-2', label: behavior.label, context, preparedMessage, behavior, result});
     if (result) {
-      span.setAttribute("replied", true);
+      RollemContext.getOrThrow().markReplied();
       await this.handleReply(behavior, message, result);
     }
   }
