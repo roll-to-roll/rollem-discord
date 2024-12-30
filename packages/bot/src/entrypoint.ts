@@ -2,7 +2,6 @@
 import "reflect-metadata";
 import { TelemetryService } from "@common/services/logger.service/telemetry.service";
 import nodeFetch from 'node-fetch';
-import util from 'util';
 global.fetch = nodeFetch as any;
 
 import { OriginalConfig } from "@root/platform/original-config.service";
@@ -16,13 +15,11 @@ import { RollemRandomSources } from "@bot/lib/rollem-random-sources.service";
 import { RepliedMessageCache } from "@bot/lib/replied-message-cache.service";
 import { Parsers } from "@common/services/parsers.service";
 import { RollemParserV1, RollemParserV1Beta, RollemParserV2 } from "@rollem/language";
-import { PromLoggerApi } from "@common/services/prom-logger.service/prom-logger-api.servic";
 import { ClientConfigService } from "@root/platform/discord/client/client-config.service";
 import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
 import { DeadmanSwitchBehavior } from "@bot/behaviors/deadman-switch";
 import { DieOnDisconnectBehavior } from "@bot/behaviors/die-on-disconnect.behavior";
 import { DieOnErrorBehavior } from "@bot/behaviors/die-on-error.behavior";
-import { DiscordBehaviorBase } from "@bot/behaviors/discord.behavior.base";
 import { EventMonitorBehavior } from "@bot/behaviors/event-monitor.behavior";
 import { HeartbeatBehavior } from "@bot/behaviors/heartbeat.behavior.behavior";
 import { StandardAdapter } from "@bot/behaviors/standard-adapter.behavior";
@@ -40,12 +37,10 @@ import { BehaviorStatsBase } from "@common/standard-behaviors/stat.behavior.base
 import { DiscordStats } from "@root/platform/discord/discord-stats";
 import { ClassProvider } from "injection-js";
 import { Status } from "discord.js";
-import pidusage from "pidusage";
 import { fetchGatewayBotInfo } from "@root/platform/discord/startup";
 import { humanizeInteger } from "@common/util/number-with-commas";
 import { humanizeMillisForDebug } from "@common/util/humanize-duration";
 import { CacheService } from "@root/platform/discord/client/cache/cache.service";
-import { GlobalAppState } from "@root/platform/discord/global-app-state";
 import { EnvConfig } from "@root/platform/env-config.service";
 
 const ORDERED_STANDARD_BEHAVIORS: Newable<BehaviorBase>[] = [

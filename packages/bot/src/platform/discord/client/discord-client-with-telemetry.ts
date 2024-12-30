@@ -1,8 +1,8 @@
 
 import { OTel } from "@common/services/logger.service/open-telemetry/config";
-import { RollemContext } from "@common/services/logger.service/open-telemetry/processors/initializers/rollem-context";
+import { RollemContext } from "@common/services/logger.service/open-telemetry/processors/initializers/rollem";
 import { BorgName } from "@common/util/borg-designation";
-import { Context, SpanKind, SpanStatusCode, context, trace } from "@opentelemetry/api";
+import { Context, SpanKind, SpanStatusCode, context } from "@opentelemetry/api";
 import { ENV_CONFIG } from "@root/platform/env-config.service";
 import { Awaitable, Client, ClientEvents, ClientOptions, Collection, version } from "discord.js";
 
@@ -88,6 +88,7 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
           channel: message.channelId,
           guild: message.guildId ?? undefined,
           shardSet: ENV_CONFIG.shardSetInfo.name,
+          event: event,
           shard: BorgName.indexOfCount(
             message.guild?.shardId ?? 0,
             ENV_CONFIG.shardSetInfo.totalShards),

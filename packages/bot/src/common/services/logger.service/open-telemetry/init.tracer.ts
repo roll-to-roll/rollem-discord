@@ -4,7 +4,7 @@ import { OTel } from "@common/services/logger.service/open-telemetry/config";
 import { OTel_Exporter_Console } from "@common/services/logger.service/open-telemetry/processors/exporters/console.exporter";
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { OTel_Exporter_OTLP_GRPC } from "@common/services/logger.service/open-telemetry/processors/exporters/otlp-grpc.exporter";
-import { OTel_Initializer_Baggage } from "@common/services/logger.service/open-telemetry/processors/initializers/rollem-context";
+import { OTel_Initializer_Baggage } from "@common/services/logger.service/open-telemetry/processors/initializers/rollem";
 
 export const tracerProvider = new NodeTracerProvider({
   resource: OTel.resource,

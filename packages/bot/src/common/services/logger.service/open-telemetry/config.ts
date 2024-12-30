@@ -7,6 +7,7 @@ import {
 } from '@opentelemetry/semantic-conventions';
 import { metrics, trace, context, propagation } from "@opentelemetry/api";
 import { logs } from "@opentelemetry/api-logs";
+import { api as sdkApi } from "@opentelemetry/sdk-node";
 
 export namespace OTel {
   /** Open Telemetry Resource Model */
@@ -25,8 +26,10 @@ export namespace OTel {
     logs: logs,
     context: context,
     propagation: propagation,
+    createContextKey: sdkApi.createContextKey,
   }
 }
+
 
 // const sdkConfig: Partial<NodeSDKConfiguration> = {
 //   resource: resource,
