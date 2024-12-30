@@ -1,4 +1,4 @@
-import { Client, Message } from "discord.js";
+import { Message, version } from "discord.js";
 import { Logger, LoggerCategory } from "@common/services/logger.service/logger.service";
 import { Inject, Injectable } from "injection-js";
 import { BehaviorBase } from "@common/standard-behaviors/behavior.base";
@@ -10,6 +10,15 @@ import { DiscordBehaviorBase } from './discord.behavior.base';
 import { BehaviorResponse } from "@common/standard-behaviors/types/behavior-response";
 import { PromLogger } from "@common/services/prom-logger.service/prom-logger.service";
 import { DiscordClientService } from "@root/platform/discord/client/discord-client.service";
+import { OTel } from "@common/services/logger.service/open-telemetry/config";
+import { tryCatchFinally } from "@common/services/logger.service/open-telemetry/utils";
+import { RollemContext } from "@common/services/logger.service/open-telemetry/processors/initializers";
+import { Span, SpanKind } from '@opentelemetry/api';
+
+const tracer = OTel.api.trace.getTracer(
+  'rollem|standard-adapter',
+  version,
+);
 
 /** A base for behaviors to be applied to a discord client. */
 @Injectable()
@@ -50,7 +59,9 @@ export class StandardAdapter extends DiscordBehaviorBase {
       // ignore re-delivered messages
       if (this.repliedMessageCache.hasSeenMessageBefore(message, "adapter")) { return; }
 
-      const context = await this.buildContext(message);
+      const context = await tracer.startActiveSpan(
+        'buildContext', { kind: SpanKind.INTERNAL },
+        tryCatchFinally(async (_span) => await this.buildContext(message)));
 
       await this.handleAll(message, context);
     });
@@ -118,39 +129,82 @@ export class StandardAdapter extends DiscordBehaviorBase {
   }
 
   private async handleAll(message: Message, context: BehaviorContext): Promise<void> {
-    const preparedMessage = await this.prepareMessage(message, context);
+    const preparedMessage = await tracer.startActiveSpan(
+      'prepareMessage', { kind: SpanKind.INTERNAL },
+      tryCatchFinally(async (_span) => await this.prepareMessage(message, context)));
+
     if (!preparedMessage) { return; }
 
     context.messageConfiguredOptions = { prefixStyle: preparedMessage.prefixStyle };
 
     // console.log({event: 'handleAll-1', context, preparedMessage});
 
-    for (const behavior of this.behaviors) {
-      let result: BehaviorResponse | null = null;
-      switch (preparedMessage.prefixStyle) {
-        case PrefixStyle.DirectPing:
-          result = await behavior.onDirectPing(message, preparedMessage.content, context);
-          break;
-        case PrefixStyle.ProvidedOrNotRequired:
-          result = await behavior.onPrefixProvidedOrNotRequired(message, preparedMessage.content, context);
-          break;
-        default:
-        case PrefixStyle.Missing:
-          result = await behavior.onPrefixMissing(message, preparedMessage.content, context);
-          break;
-      }
-
-      // console.log({event: 'handleAll-2', label: behavior.label, context, preparedMessage, behavior, result});
-      if (result) {
-        this.handleReply(behavior, message, result);
-      }
+    const resultPromises = this.behaviors.map(
+      behavior => this.handleOneMessageContext(behavior, message, preparedMessage, context));
+    await Promise.allSettled(resultPromises);
+    for (const resultPromise of resultPromises) {
+      await resultPromise;
     }
   }
 
-  private handleReply(behavior: BehaviorBase, message: Message<boolean>, result: BehaviorResponse) {
+  private async handleOneMessageContext(
+    behavior: BehaviorBase,
+    message: Message<boolean>,
+    preparedMessage: { content: string; prefixStyle: PrefixStyle; },
+    context: BehaviorContext
+  ): Promise<void> {
+    return await tracer.startActiveSpan( behavior.label,
+      tryCatchFinally(async (span) => await this.handleOneMessage(span, behavior, message, preparedMessage, context)));
+  }
+
+  private async handleOneMessage(
+    span: Span,
+    behavior: BehaviorBase,
+    message: Message<boolean>,
+    preparedMessage: { content: string; prefixStyle: PrefixStyle; },
+    context: BehaviorContext
+  ): Promise<void> {
+    const result = await this.handleOneMessageSwitch(behavior, message, preparedMessage, context);
+
+    // console.log({event: 'handleAll-2', label: behavior.label, context, preparedMessage, behavior, result});
+    if (result) {
+      span.setAttribute("replied", true);
+      await this.handleReply(behavior, message, result);
+    }
+  }
+
+  private async handleOneMessageSwitch(
+    behavior: BehaviorBase,
+    message: Message<boolean>,
+    preparedMessage: { content: string; prefixStyle: PrefixStyle; },
+    context: BehaviorContext
+  ): Promise<BehaviorResponse | undefined> {
+    switch (preparedMessage.prefixStyle) {
+      case PrefixStyle.DirectPing:
+        return await behavior.onDirectPing(message, preparedMessage.content, context) ?? undefined;
+      case PrefixStyle.ProvidedOrNotRequired:
+        return await behavior.onPrefixProvidedOrNotRequired(message, preparedMessage.content, context) ?? undefined;
+      default:
+      case PrefixStyle.Missing:
+        return await behavior.onPrefixMissing(message, preparedMessage.content, context) ?? undefined;
+
+    }
+  }
+
+  private async handleReply(behavior: BehaviorBase, message: Message<boolean>, result: BehaviorResponse) {
+    RollemContext.getOrThrow().djs.replied = true;
+
     if (!this.config.inLocalDiagnosticMode) {
       this.logger.trackMessageEvent(LoggerCategory.BehaviorEvent, `${behavior.label}`, message, { result });
-      message.reply(result.response).catch(rejected => this.handleSendRejection(message));
+
+      await tracer.startActiveSpan('reply', { kind: SpanKind.CLIENT },
+        tryCatchFinally(async (_span) => {
+          try {
+            await message.reply(result.response);
+          } catch (e) {
+            this.handleSendRejection(message);
+          }
+        }));
     } else {
       this.logger.trackMessageEvent(LoggerCategory.BehaviorEvent, `[DIAGNOSTIC - REPLY NOT SENT] ${behavior.label}`, message, { result });
     }

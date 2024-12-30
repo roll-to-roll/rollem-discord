@@ -12,6 +12,9 @@ export interface RollemContextInterface {
   /** Is channel a DM. */
   isDM?: boolean,
 
+  /** Set to true when we sent a reply as a result. */
+  replied?: boolean,
+
   /** Contains label for this ShardSet. */
   shardSet?: string,
 

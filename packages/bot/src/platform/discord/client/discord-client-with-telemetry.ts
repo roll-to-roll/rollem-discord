@@ -1,6 +1,7 @@
 
 import { OTel } from "@common/services/logger.service/open-telemetry/config";
 import { RollemContext } from "@common/services/logger.service/open-telemetry/processors/initializers/rollem";
+import { tryCatchFinally } from "@common/services/logger.service/open-telemetry/utils";
 import { BorgName } from "@common/util/borg-designation";
 import { Tracing } from "@common/util/tracing";
 import { Context, SpanKind, SpanStatusCode, context } from "@opentelemetry/api";
@@ -62,22 +63,11 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
   }
 
   private async onInternalEach<TEvent extends keyof ClientEvents>(listener: ListenerFunc<TEvent>, listenerRegistrant: string, event: TEvent, ...args: ClientEvents[TEvent]): Promise<void> {
-    await tracer.startActiveSpan(`on(${event}) ${listenerRegistrant}`, { kind: SpanKind.INTERNAL }, this.createContext(event, ...args),
-      async (span) => {
-        try {
-          await listener(...args);
-          span.setStatus({ code: SpanStatusCode.OK });
-        }
-        catch (e: unknown) {
-          if (e instanceof Error) { 
-            span.recordException(e);
-          }
-          span.setStatus({ code: SpanStatusCode.ERROR });
-        }
-        finally {
-          span.end();
-        }
-      });
+    await tracer.startActiveSpan(
+      `on(${event}) ${listenerRegistrant}`,
+      { kind: SpanKind.INTERNAL },
+      this.createContext(event, ...args),
+      tryCatchFinally(async (_span) => await listener(...args)));
   }
 
   private createContext<TEvent extends keyof ClientEvents>(event: TEvent, ...args: ClientEvents[TEvent]): Context {
