@@ -5,7 +5,6 @@
   "author": "David <npm@davidsharer.com>",
   "bugs": "https://github.com/rollem-discord/rollem-discord/issues",
   "dependencies": {
-    "applicationinsights": "^2.9.1",
     "chai": "^3.5.0",
     "chance": "^1.1.5",
     "del": "^3.0.0",

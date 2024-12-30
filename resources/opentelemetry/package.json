@@ -1,0 +1,19 @@
+{
+  "name": "@rollem-resources/opentelemetry",
+  "description": "Contains utilities for local testing of opentelemetry",
+  "packageManager": "yarn@4.5.0",
+  "private": true,
+  "scripts": {
+    "____________________note01____________________": "all commands prefixed with `:` need review // TODO: Review",
+    "____________________note02____________________": "all non-pinned commands should be prefixed with `::<scope>:` to avoid cross-workspace build actions",
+    "____________________note03a____________________": "build = fresh-build",
+    "____________________note03b____________________": "watch = fresh-build -> watch",
+    "____________________note03c____________________": "dev = fresh-build -> watch -> live-update",
+    "____________________note03d____________________": "start = only start",
+    "____________________note04e____________________": "package = fresh build + package",
+    "__________________________________________________": "end of notes",
+    "____________________pinned____________________": "common commands",
+    ":aspire-dashboard": "docker compose up",
+    ":aspire-dashboard:down": "docker compose down"
+  }
+}

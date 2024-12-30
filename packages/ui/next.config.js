@@ -76,7 +76,6 @@ module.exports = {
       new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/api$/ }), // ???
       new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/sdk-trace-base$/ }), // ???
       new IgnorePlugin({ resourceRegExp: /^@azure\/functions-core$/ }), // ???
-      new IgnorePlugin({ resourceRegExp: /^applicationinsights-native-metrics$/ }), // ???
     );
 
     // console.log(defaultLoaders);
