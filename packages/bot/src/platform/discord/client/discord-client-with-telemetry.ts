@@ -2,6 +2,7 @@
 import { OTel } from "@common/services/logger.service/open-telemetry/config";
 import { RollemContext } from "@common/services/logger.service/open-telemetry/processors/initializers/rollem";
 import { BorgName } from "@common/util/borg-designation";
+import { Tracing } from "@common/util/tracing";
 import { Context, SpanKind, SpanStatusCode, context } from "@opentelemetry/api";
 import { ENV_CONFIG } from "@root/platform/env-config.service";
 import { Awaitable, Client, ClientEvents, ClientOptions, Collection, version } from "discord.js";
@@ -16,7 +17,7 @@ export type ListenerFunc<TEvent extends keyof ClientEvents = keyof ClientEvents>
 export class DiscordClientWithTelemetry extends Client<boolean> {
   private _root?: Collection<keyof ClientEvents, ListenerFunc<any>>;
 
-  private _registered?: Collection<keyof ClientEvents, Collection<ListenerFunc<any>, true>>;
+  private _registered?: Collection<keyof ClientEvents, Collection<ListenerFunc<any>, string>>;
 
   public constructor(options: ClientOptions) {
     super(options);
@@ -27,7 +28,7 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
   }
 
   public get registered() {
-    return (this._registered ??= new Collection<keyof ClientEvents, Collection<ListenerFunc<any>, true>>());
+    return (this._registered ??= new Collection<keyof ClientEvents, Collection<ListenerFunc<any>, string>>());
   }
 
   public on<TEvent extends keyof ClientEvents>(event: TEvent, listener: ListenerFunc<TEvent>): this {
@@ -38,9 +39,12 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
       return rootEventFn;
     });
 
+    const stack = Tracing.getCaller();
+    const registrant = stack?.callerId ?? "unknown";
+
     this.registered
-      .ensure(event, (_key, _coll) => new Collection<ListenerFunc<TEvent>, true>())
-      .set(listener, true);
+      .ensure(event, (_key, _coll) => new Collection<ListenerFunc<TEvent>, string>())
+      .set(listener, registrant);
 
     return this;
   }
@@ -48,8 +52,8 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
   private async onInternalRoot<TEvent extends keyof ClientEvents>(event: TEvent, ...args: ClientEvents[TEvent]): Promise<void> {
     await tracer.startActiveSpan(`on(${event})`, { kind: SpanKind.SERVER, root: true }, this.createContext(event, ...args),
       async (span) => {
-        const listeners = [...this.registered.get(event)?.keys() ?? []];
-        const promises = listeners.map(listener => this.onInternalEach(listener, event, ...args));
+        const listeners = [...this.registered.get(event)?.entries() ?? []];
+        const promises = listeners.map(listener => this.onInternalEach(listener[0], listener[1], event, ...args));
         const result = await Promise.allSettled(promises);
         const allGood = result.every(r => r.status == "fulfilled");
         const finalStatus = allGood ? SpanStatusCode.OK : SpanStatusCode.ERROR;
@@ -57,8 +61,8 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
       });
   }
 
-  private async onInternalEach<TEvent extends keyof ClientEvents>(listener: ListenerFunc<TEvent>, event: TEvent, ...args: ClientEvents[TEvent]): Promise<void> {
-    await tracer.startActiveSpan(`on(${event})`, { kind: SpanKind.INTERNAL }, this.createContext(event, ...args),
+  private async onInternalEach<TEvent extends keyof ClientEvents>(listener: ListenerFunc<TEvent>, listenerRegistrant: string, event: TEvent, ...args: ClientEvents[TEvent]): Promise<void> {
+    await tracer.startActiveSpan(`on(${event}) ${listenerRegistrant}`, { kind: SpanKind.INTERNAL }, this.createContext(event, ...args),
       async (span) => {
         try {
           await listener(...args);
@@ -83,6 +87,7 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
         return RollemContext.set({
           isBot: message.author.bot,
           isRollem: message.author.id === this.application?.client.user.id,
+          isDM: message.channel.isDMBased(),
           message: message.id,
           author: message.author.id,
           channel: message.channelId,

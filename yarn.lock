@@ -2793,6 +2793,7 @@ __metadata:
     "@types/lodash": "npm:^4.14.170"
     "@types/mocha": "npm:^8"
     "@types/node": "npm:^18"
+    callsites: "npm:^4.2.0"
     chai: "npm:^3.5.0"
     chance: "npm:^1.1.5"
     copy-webpack-plugin: "npm:^8.1.0"
@@ -5839,6 +5840,13 @@ __metadata:
   version: 3.1.0
   resolution: "callsites@npm:3.1.0"
   checksum: 10c0/fff92277400eb06c3079f9e74f3af120db9f8ea03bad0e84d9aede54bbe2d44a56cccb5f6cf12211f93f52306df87077ecec5b712794c5a9b5dac6d615a3f301
+  languageName: node
+  linkType: hard
+
+"callsites@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "callsites@npm:4.2.0"
+  checksum: 10c0/8f7e269ec09fc0946bb22d838a8bc7932e1909ab4a833b964749f4d0e8bdeaa1f253287c4f911f61781f09620b6925ccd19a5ea4897489c4e59442c660c312a3
   languageName: node
   linkType: hard
 

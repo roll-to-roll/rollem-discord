@@ -9,6 +9,9 @@ export interface RollemContextInterface {
   /** True when the initiator was Rollem itself. */
   isRollem?: boolean,
 
+  /** Is channel a DM. */
+  isDM?: boolean,
+
   /** Contains label for this ShardSet. */
   shardSet?: string,
 

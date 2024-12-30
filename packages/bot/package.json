@@ -25,6 +25,7 @@
     "@opentelemetry/semantic-conventions": "^1.28.0",
     "@rollem/common": "workspace:*",
     "@rollem/language": "workspace:*",
+    "callsites": "^4.2.0",
     "chai": "^3.5.0",
     "chance": "^1.1.5",
     "del": "^3.0.0",
