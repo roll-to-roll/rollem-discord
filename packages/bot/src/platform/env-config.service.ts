@@ -18,7 +18,7 @@ function OptionalBoolSchema(name: string) {
 }
 
 const discordSnowflake = z.custom<Snowflake>((val) => {
-  return typeof val === "string" ? /^\d+px$/.test(val) : false;
+  return typeof val === "string" ? /^\d+$/.test(val) : false;
 });
 
 const EnvSchema = z.object({
