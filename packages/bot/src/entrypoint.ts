@@ -42,6 +42,7 @@ import { humanizeInteger } from "@common/util/number-with-commas";
 import { humanizeMillisForDebug } from "@common/util/humanize-duration";
 import { CacheService } from "@root/platform/discord/client/cache/cache.service";
 import { EnvConfig } from "@root/platform/env-config.service";
+import { PromLoggerApi } from "@common/services/prom-logger.service/prom-logger-api.service";
 
 const ORDERED_STANDARD_BEHAVIORS: Newable<BehaviorBase>[] = [
   PingPongBehavior,
@@ -75,6 +76,7 @@ async function doInit() {
     RollemRandomSources,
     OriginalConfig,
     { provide: Storage, useValue: new Storage() },
+    PromLoggerApi,
     RollemParserV1,
     RollemParserV1Beta,
     RollemParserV2,
