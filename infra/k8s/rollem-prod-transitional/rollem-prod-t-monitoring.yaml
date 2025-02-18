@@ -2,14 +2,14 @@
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:
-  name: rollem-next
-  namespace: rollem-next-transitional
+  name: rollem-prod
+  namespace: rollem-prod-transitional
   labels:
     team: frontend
 spec:
   selector:
     matchLabels:
-      app: rollem-next-t
+      app: rollem-prod-t
   podMetricsEndpoints:
   - port: web
   podTargetLabels:

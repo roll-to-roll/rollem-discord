@@ -44,6 +44,7 @@ export class ClientConfigService implements IInitializeable {
       });
 
     this.ourBucket = this.grouping.preferredBuckets[ENV_CONFIG.shardSetInfo.index];
+    debugger;
   }
 
   /** Used by the client during construction. */
