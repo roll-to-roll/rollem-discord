@@ -1,0 +1,24 @@
+{
+  "name": "@rollem-resources/cluster-local",
+  "description": "Contains utilities relating to the local k8s cluster",
+  "private": true,
+  "packageManager": "yarn@4.5.0",
+  "scripts": {
+    "____________________note01____________________": "all commands prefixed with `:` need review // TODO: Review",
+    "____________________note02____________________": "all non-pinned commands should be prefixed with `::<scope>:` to avoid cross-workspace build actions",
+    "____________________note03a____________________": "build = fresh-build",
+    "____________________note03b____________________": "watch = fresh-build -> watch",
+    "____________________note03c____________________": "dev = fresh-build -> watch -> live-update",
+    "____________________note03d____________________": "start = only start",
+    "____________________note04e____________________": "package = fresh build + package",
+    "__________________________________________________": "end of notes",
+    "____________________pinned____________________": "common commands",
+    "helm--ls": "kubectl get all --all-namespaces -l='app.kubernetes.io/managed-by=Helm'",
+    "gc--ls": "kubectl get all --all-namespaces -l='app.kubernetes.io/managed-by=Helm,app.kubernetes.io/instance=grafana-k8s-monitoring'",
+    "gc--status": "helm status grafana-k8s-monitoring --namespace monitoring --show-resources --output table",
+    "____________________grafana cloud____________________": "Grafana Cloud commands",
+    "gc--apply": "helm upgrade --install --version ^1 --atomic --timeout 300s grafana-k8s-monitoring grafana/k8s-monitoring --namespace monitoring --create-namespace -f ./namespaces/monitoring/grafana-cloud/base.secrets.yaml -f ./namespaces/monitoring/grafana-cloud/secrets.yaml -f ./namespaces/monitoring/grafana-cloud/values.custom.yaml",
+    "gc--upgrade": "helm repo add grafana https://grafana.github.io/helm-charts && helm repo update && helm upgrade --install --version ^1 --atomic --timeout 300s grafana-k8s-monitoring grafana/k8s-monitoring --namespace monitoring --create-namespace -f ./namespaces/monitoring/grafana-cloud/base.secrets.yaml -f ./namespaces/monitoring/grafana-cloud/secrets.yaml -f ./namespaces/monitoring/grafana-cloud/values.custom.yaml",
+    "gc--remove": "helm uninstall grafana-k8s-monitoring --namespace monitoring"
+  }
+}

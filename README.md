@@ -33,6 +33,19 @@ You may have both `@rollem-next` and `@rollem` in the same server, but they shou
 # Running Locally (via Docker Desktop)
 If you aren't planning to make changes locally, Docker will be the easier way to run the project.
 ## Dependency setup
+### Windows / Scoop
+1. Get required tools
+   1. Scoop ([follow instructions](https://scoop.sh/))
+   2. Git + CLI `scoop install git-with-openssh`
+   3. Local Docker [Docker Desktop for Windows](https://docs.docker.com/desktop/setup/install/windows-install/)
+2. Get optional tools
+   1. Many linux utils `scoop install busybox`
+   2. Decent tree command `scoop install main/tre-command`
+3. Clone project `git clone https://github.com/rollem-discord/rollem-discord`
+4. Any other commands I list assume you are running from the project root with Git Bash  
+   (I do this via [VSCode](https://code.visualstudio.com/))
+
+### The Hard Way
 1. Clone Project
    1. Get [Git](https://git-scm.com/downloads)
    2. Clone project `git clone https://github.com/rollem-discord/rollem-discord`

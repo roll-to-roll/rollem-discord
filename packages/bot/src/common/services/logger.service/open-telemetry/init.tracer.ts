@@ -5,14 +5,16 @@ import { OTel_Exporter_Console } from "@common/services/logger.service/open-tele
 import { NodeTracerProvider } from "@opentelemetry/sdk-trace-node";
 import { OTel_Exporter_OTLP_GRPC } from "@common/services/logger.service/open-telemetry/processors/exporters/otlp-grpc.exporter";
 import { OTel_Initializer_Baggage } from "@common/services/logger.service/open-telemetry/processors/initializers/rollem";
+import { OTel_Exporter_Prometheus } from "@common/services/logger.service/open-telemetry/processors/exporters/prometheus.exporter";
 
 export const tracerProvider = new NodeTracerProvider({
   resource: OTel.resource,
   spanProcessors: [
     ...OTel_Initializer_Baggage.instance.exporters.tracer,
-    ...OTel_Exporter_AzureMonitor.instance.exporters.tracer,
+    // ...OTel_Exporter_AzureMonitor.instance.exporters.tracer,
     ...OTel_Exporter_Console.instance.exporters.tracer,
-    ...OTel_Exporter_OTLP_GRPC.instance.exporters.tracer,
+    ...OTel_Exporter_Prometheus.instance.exporters.tracer,
+    // ...OTel_Exporter_OTLP_GRPC.instance.exporters.tracer,
   ],
 });
 
