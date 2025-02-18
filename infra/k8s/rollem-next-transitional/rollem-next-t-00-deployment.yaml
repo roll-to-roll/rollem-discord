@@ -17,7 +17,7 @@ spec:
         doks.digitalocean.com/node-pool: pool-rollem
       containers:
       - name: rollem-next-t-00
-        image: rollem/discord:date-2025.02.18-05.25--pr-236--sha-a26c15a
+        image: rollem/discord:date-2025.02.18-06.26--pr-236--sha-cd926f5
         imagePullPolicy: IfNotPresent
         ports:
         - name: web

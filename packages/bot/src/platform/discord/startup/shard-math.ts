@@ -1,6 +1,7 @@
 import { RollemConfigError } from "@common/errors";
 import { humanizeMillisForDebug } from "@common/util/humanize-duration";
 import { humanizeInteger } from "@common/util/number-with-commas";
+import { ENV_CONFIG } from "@root/platform/env-config.service";
 import { APIGatewayBotInfo } from "discord.js";
 import { chunk } from "lodash";
 import moment from "moment";
@@ -49,12 +50,19 @@ export interface ShardGroupings {
   rateLimitBuckets: Record<number, ShardRateLimitBucket>
 
   /** Sets of shards which may be started concurrently. */
-  noRateLimitBuckets: ShardRateLimitBucket[];
+  noRateLimitBuckets: Record<number, ShardRateLimitBucket>;
+
+  /** The preferred set of shard rate limit buckets -- between {@link rateLimitBuckets} and {@link noRateLimitBuckets}. */
+  preferredBuckets: Record<number, ShardRateLimitBucket>,
 }
 
 /** Options configuring @see groupShardsByRateLimitKey */
 export interface ShardGroupingOptions {
+  forcedRateLimitBucketSize?: number;
+
   forceShardCount?: number;
+
+  ignoreRateLimitBuckets?: boolean;
 }
 
 /**
@@ -67,7 +75,7 @@ export function groupShardsByRateLimitKey(botInfo: APIGatewayBotInfo, options: S
 
   const limit = botInfo.session_start_limit;
 
-  const shardCountMultiple = limit.max_concurrency; // I know from experience this is 16, which happens to match the current max_concurrency number
+  const shardCountMultiple = options.forcedRateLimitBucketSize ?? limit.max_concurrency; // I know from experience this is 16, which happens to match the current max_concurrency number
 
   // estimating off ~1,000 guilds/shard from suggested number, and assuming the suggested number is rounded up by shardCountMultiple
   const guildCountLowerBound = (botInfo.shards - shardCountMultiple) * 1_000;
@@ -100,6 +108,11 @@ export function groupShardsByRateLimitKey(botInfo: APIGatewayBotInfo, options: S
     console.debug("##   MIN SHARDS WARNING: ", "SHARD COUNT OVERRIDE IS DANGEROUSLY CLOSE TO ESTIMATED **TRUE** MINIMUM OF", minShardsUpperBoundMultiple);
   if (targetShardsCount % shardCountMultiple)
     console.debug("##     MULTIPLE WARNING: ", "Shard Count is not a multiple of max_concurrency = ", shardCountMultiple);
+  if (!!options.forcedRateLimitBucketSize)
+    console.debug("##   RATE LIMIT BUCKETS: ", "Forced to value", options.forcedRateLimitBucketSize, "where default is", limit.max_concurrency);
+  if (!!options.ignoreRateLimitBuckets)
+    console.debug("##   RATE LIMIT BUCKETS: ", "Ignored -- Preferring 'rateLimitBuckets' over 'noRateLimitBuckets'");
+
   console.debug();
 
   // bail if it's out of bounds
@@ -128,6 +141,7 @@ export function groupShardsByRateLimitKey(botInfo: APIGatewayBotInfo, options: S
     botInfo,
     rateLimitBuckets,
     noRateLimitBuckets,
+    preferredBuckets: options.ignoreRateLimitBuckets ? rateLimitBuckets : noRateLimitBuckets,
     bounds: {
       guildCount: { upper: guildCountUpperBound, lower: guildCountLowerBound },
       minShards: { upper: minShardsUpperBound, lower: minShardsLowerBound },

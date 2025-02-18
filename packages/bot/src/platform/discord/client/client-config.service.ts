@@ -35,8 +35,15 @@ export class ClientConfigService implements IInitializeable {
     await this.config.initialize();
     
     this.botInfo = await fetchGatewayBotInfo(this.config.Token);
-    this.grouping = groupShardsByRateLimitKey(this.botInfo, { forceShardCount: ENV_CONFIG.shardSetInfo.totalShards });
-    this.ourBucket = this.grouping.noRateLimitBuckets[0];
+    this.grouping = groupShardsByRateLimitKey(
+      this.botInfo,
+      {
+        forceShardCount: ENV_CONFIG.shardSetInfo.totalShards,
+        forcedRateLimitBucketSize: ENV_CONFIG.shardSetInfo.rateLimitBuckets.forcedSize,
+        ignoreRateLimitBuckets: ENV_CONFIG.shardSetInfo.rateLimitBuckets.ignore,
+      });
+
+    this.ourBucket = this.grouping.preferredBuckets[ENV_CONFIG.shardSetInfo.index];
   }
 
   /** Used by the client during construction. */
@@ -73,14 +80,14 @@ export class ClientConfigService implements IInitializeable {
       // See https://discordjs.guide/miscellaneous/cache-customization.html#limiting-caches
       makeCache: this.cache.makeCache,
 
-      ws: {
+      ws: ENV_CONFIG.shardSetInfo.rateLimitBuckets.ignore ? undefined : {
         // no waiting. we have specifically selected shards to not share rate-limit-keys
         buildIdentifyThrottler: async _ => Promise.resolve({
           waitForIdentify(_shardId, _signal) {
             return Promise.resolve();
           }
         })
-      }
+      },
     };
   }
 

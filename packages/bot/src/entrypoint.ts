@@ -103,13 +103,13 @@ async function doInit() {
   const ourBucket = intermediateDiscordScope.get(ClientConfigService).ourBucket;
   const client = intermediateDiscordScope.get(DiscordClientService).client;
   const cache = intermediateDiscordScope.get(CacheService);
-  client.on('messageCreate', async message => {
-    console.log("==================== message");
-    const author = await message.guild?.members.fetchMe();
-    const authorRoleNames = author?.roles.cache.map(r => r.name) ?? [];
-    console.debug(authorRoleNames);
-    console.log("==================== /message")
-  });
+  // client.on('messageCreate', async message => {
+  //   console.log("==================== message");
+  //   const author = await message.guild?.members.fetchMe();
+  //   const authorRoleNames = author?.roles.cache.map(r => r.name) ?? [];
+  //   console.debug(authorRoleNames);
+  //   console.log("==================== /message")
+  // });
   
   setInterval(async () => await printUsage(), 10_000);
   

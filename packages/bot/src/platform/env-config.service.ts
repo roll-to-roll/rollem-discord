@@ -29,12 +29,17 @@ const EnvSchema = z.object({
     .min(0, 'DISCORD_BOT_SHARDSET_ID must be a positive integer'),
   DISCORD_BOT_SHARDSET_COUNT: z.coerce
     .number({ invalid_type_error: 'DISCORD_BOT_SHARDSET_COUNT must be a positive integer' })
-    .min(1, 'DISCORD_BOT_SHARDSET_COUNT must be a positive integer'),
+    .min(1, 'DISCORD_BOT_SHARDSET_COUNT must be a non-zero positive integer'),
   DISCORD_BOT_SHARDSET_SHARDS_PER_SET: z.coerce
     .number({ invalid_type_error: 'DISCORD_BOT_SHARDSET_SHARDS_PER_SET must be a positive integer' })
-    .min(1, 'DISCORD_BOT_SHARDSET_SHARDS_PER_SET must be a positive integer'),
+    .min(1, 'DISCORD_BOT_SHARDSET_SHARDS_PER_SET must be a non-zero positive integer'),
 
   DISCORD_BOT_USER_TOKEN: z.string({ required_error: 'DISCORD_BOT_USER_TOKEN missing'}),
+  DISCORD_BOT_SHARDSET_RATELIMIT_BUCKETS_IGNORE: OptionalBoolSchema("DISCORD_BOT_SHARDSET_RATELIMIT_BUCKETS_IGNORE"),
+  DISCORD_BOT_SHARDSET_RATELIMIT_BUCKETS_FORCE: z.coerce
+    .number({ invalid_type_error: 'DISCORD_BOT_SHARDSET_RATELIMIT_BUCKETS_FORCE must be a non-negative integer' })
+    .min(1, 'DISCORD_BOT_SHARDSET_RATELIMIT_BUCKETS_FORCE must be a non-zero positive integer')
+    .optional(),
 
   ROLLEM_LOCAL_DIAGNOSTIC_MODE: OptionalBoolSchema("ROLLEM_LOCAL_DIAGNOSTIC_MODE"),
   DEFER_TO_CLIENT_IDS: z.string().optional().transform(v => v?.split(',').map(v => v.trim()))
@@ -107,6 +112,12 @@ export class EnvConfig implements IInitializeable {
       setCount: this.env.DISCORD_BOT_SHARDSET_COUNT,
       shardsPerSet: this.env.DISCORD_BOT_SHARDSET_SHARDS_PER_SET,
       totalShards: this.env.DISCORD_BOT_SHARDSET_COUNT * this.env.DISCORD_BOT_SHARDSET_SHARDS_PER_SET,
+
+      rateLimitBuckets: {
+        ignore: this.env.DISCORD_BOT_SHARDSET_RATELIMIT_BUCKETS_IGNORE,
+        forcedSize: this.env.DISCORD_BOT_SHARDSET_RATELIMIT_BUCKETS_FORCE,
+      },
+      
       name: BorgName.indexOfCountForGroup(
         this.env.DISCORD_BOT_SHARDSET_ID,
         this.env.DISCORD_BOT_SHARDSET_COUNT,
