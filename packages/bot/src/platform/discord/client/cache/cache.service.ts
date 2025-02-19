@@ -63,15 +63,27 @@ export class CacheService {
    */
   private makeCacheOverrideDangerous(
     managerType: DJS_ManagerType_Forbidden,
-    _holds: DJS_Holds_Forbidden,
-    _manager: DJS_Manager_Forbidden,
+    holds: DJS_Holds_Forbidden,
+    manager: DJS_Manager_Forbidden,
   ): DJS_AcceptableCache_Forbidden | undefined {
     switch (managerType) {
-      case RoleManager: return new RoleCollection();
+      // TODO: "Disabling" these (in favor of the default behavior) to see if it is the cause of the crashes. 2025-02-19
+      // follow standard procedure
+      case RoleManager: //return new RoleCollection();
+        return this.makeCacheWithLimits(
+          managerType as any as DJS_ManagerType,
+          holds as any as DJS_Holds,
+          manager as any as DJS_Manager);
+
+      // custom singleton overrides
       case GuildManager: return new GuildCollection();
       case ChannelManager: return new ChannelCollection();
       case GuildMemberManager: return new GuildMemberCollection();
-      default: return undefined;
+
+      // if it's not explicitly handled, it passes down the chain of potential sources (typically resulting in /dev/null)
+      case PermissionOverwriteManager: // this is not recommended to override, but it has a horrible amount of overhead
+      default:
+          return undefined;
     }
   }
 

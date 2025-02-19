@@ -66,6 +66,8 @@
     "infra-logs-next-t-all": "sh -c 'kubectl logs -n rollem-next-transitional `kubectl get pods -n rollem-next-transitional -o wide --selector=app=rollem-next-t -o name --no-headers | grep rollem-next-t-${0}-deployment` -f'",
     "infra-delete-bad-next-t": "kubectl get pods -n rollem-next-transitional | grep -e Evicted -e Error -e ContainerStatusUnknown -e OOMKilled -e ImagePullBackOff | awk '{print $1}' | xargs kubectl delete pod -n rollem-next-transitional",
 
+    
+    "infra-restart-prod-t": "sh -c 'kubectl rollout restart deployment -n rollem-prod-transitional rollem-prod-t-${0}-deployment'",
     "infra-apply-prod-t": "kubectl apply -f ./infra/k8s/rollem-prod-transitional/",
     "infra-logs-prod-t": "sh -c 'kubectl logs -n rollem-prod-transitional `kubectl get pods -n rollem-prod-transitional -o wide --selector=app=rollem-prod-t -o name --no-headers | grep rollem-prod-t-${0}-deployment` --tail 10 -f'",
     "infra-logs-prod-t-all": "sh -c 'kubectl logs -n rollem-prod-transitional `kubectl get pods -n rollem-prod-transitional -o wide --selector=app=rollem-prod-t -o name --no-headers | grep rollem-prod-t-${0}-deployment` -f'",
