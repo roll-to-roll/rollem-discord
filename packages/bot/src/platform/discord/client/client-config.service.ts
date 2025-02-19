@@ -44,7 +44,6 @@ export class ClientConfigService implements IInitializeable {
       });
 
     this.ourBucket = this.grouping.preferredBuckets[ENV_CONFIG.shardSetInfo.index];
-    debugger;
   }
 
   /** Used by the client during construction. */
@@ -56,6 +55,7 @@ export class ClientConfigService implements IInitializeable {
       // TODO: Investigate full implications of partials
       partials: [
         Partials.Message, // this is the only one we actually need non-partial for
+        Partials.Channel, // this is required to receive DMs from users that are not me (wtf?)
       ],
 
       // TODO: we can probably reduce this once we no longer need a deadman switch
