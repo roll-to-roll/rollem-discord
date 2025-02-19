@@ -1,0 +1,158 @@
+# custom_config:
+#   excludeMetrics: &myExcludeMetrics
+#   - kube_replicaset_*
+
+#   extraRelabelingRules: &myRelabelingRules ""
+#   # extraRelabelingRules: &myRelabelingRules |-
+#   #   rule {
+#   #     regex = "replicaset"
+#   #     action = "labeldrop"
+#   #   }
+#   #   rule {
+#   #     regex = "guild_id"
+#   #     action = "labeldrop"
+#   #   }
+
+#   extraMetricRelabelingRules: &myMetricRelabelingRules ""
+#   # extraMetricRelabelingRules: &myMetricRelabelingRules |-
+#   #   rule {
+#   #     regex = "replicaset"
+#   #     action = "labeldrop"
+#   #   }
+#   #   rule {
+#   #     regex = "guild_id"
+#   #     action = "labeldrop"
+#   #   }
+
+# metrics:
+#   enabled: true
+#   extraRelabelingRules: *myRelabelingRules
+#   extraMetricRelabelingRules: *myMetricRelabelingRules
+#   alloy:
+#     enabled: true
+#     metricsTuning: # Will filter to the metrics that will populate the Grafana Alloy integration
+#       useIntegrationAllowList: true
+#       excludeMetrics: *myExcludeMetrics
+#       extraRelabelingRules: *myRelabelingRules
+#       extraMetricRelabelingRules: *myMetricRelabelingRules
+#   kube-state-metrics:
+#     metricsTuning: # No filtering, keep all metrics
+#       useDefaultAllowList: false
+#       excludeMetrics: *myExcludeMetrics
+#       extraRelabelingRules: *myRelabelingRules
+#       extraMetricRelabelingRules: *myMetricRelabelingRules
+#   kubelet:
+#     metricsTuning: # Will only keep these two metrics
+#       useDefaultAllowList: false
+#       includeMetrics: *myExcludeMetrics
+#       extraRelabelingRules: *myRelabelingRules
+#       extraMetricRelabelingRules: *myMetricRelabelingRules
+#   cadvisor:
+#     enabled: true
+#     metricsTuning: # Will keep the default set of metrics and also include these three more
+#       useDefaultAllowList: true
+#       excludeMetrics: *myExcludeMetrics
+#       extraRelabelingRules: *myRelabelingRules
+#       extraMetricRelabelingRules: *myMetricRelabelingRules
+#   cost:
+#     enabled: true
+#     metricsTuning: # Will keep all metrics except those that start with "go_*"
+#       excludeMetrics: *myExcludeMetrics
+#   kepler:
+#     enabled: true
+#   node-exporter:
+#     enabled: true
+#     metricsTuning: # Will filter to the metrics that will populate the Linux node integration: https://grafana.com/docs/grafana-cloud/monitor-infrastructure/integrations/integration-reference/integration-linux-node/
+#       useIntegrationAllowList: true
+#       excludeMetrics: *myExcludeMetrics
+#       extraMetricRelabelingRules: *myMetricRelabelingRules
+
+# logs:
+#   enabled: true
+#   pod_logs:
+#     enabled: true
+#   cluster_events:
+#     enabled: false
+
+# traces:
+#   enabled: true
+
+# receivers:
+#   grpc:
+#     enabled: true
+#   http:
+#     enabled: true
+#   zipkin:
+#     enabled: false
+#   grafanaCloudMetrics:
+#     enabled: false
+
+# kube-state-metrics:
+#   enabled: true
+
+# prometheus-node-exporter:
+#   enabled: true
+
+# prometheus-operator-crds:
+#   enabled: true
+
+# kepler:
+#   enabled: true
+
+# alloy: {}
+
+# alloy-events: {}
+
+# alloy-logs: {}
+
+metrics:
+  extraMetricRelabelingRules: &myMetricRelabelingRules |-
+    rule {
+      source_labels = ["__name__"]
+      regex = "(nodejs_|process_|go_).*"
+      action = "drop"
+    }
+  enabled: true
+  alloy:
+    metricsTuning:
+      useIntegrationAllowList: true
+  cost:
+    enabled: false
+  kepler:
+    enabled: false
+  cadvisor:
+    enabled: false
+  kubelet:
+    enabled: false
+  node-exporter:
+    enabled: false # true
+logs:
+  enabled: true
+  pod_logs:
+    enabled: true
+  cluster_events:
+    enabled: true
+traces:
+  enabled: true
+receivers:
+  grpc:
+    enabled: true
+  http:
+    enabled: true
+  zipkin:
+    enabled: false
+  grafanaCloudMetrics:
+    enabled: false
+opencost:
+  enabled: false
+kube-state-metrics:
+  enabled: false # true
+prometheus-node-exporter:
+  enabled: false # true
+prometheus-operator-crds:
+  enabled: true
+kepler:
+  enabled: false
+alloy: {}
+alloy-events: {}
+alloy-logs: {}

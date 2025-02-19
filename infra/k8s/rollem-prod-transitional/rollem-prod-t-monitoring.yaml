@@ -1,0 +1,16 @@
+# https://github.com/prometheus-operator/prometheus-operator/blob/main/Documentation/user-guides/getting-started.md
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: rollem-prod
+  namespace: rollem-prod-transitional
+  labels:
+    team: frontend
+spec:
+  selector:
+    matchLabels:
+      app: rollem-prod-t
+  podMetricsEndpoints:
+  - port: web
+  podTargetLabels:
+  - name

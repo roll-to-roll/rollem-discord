@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rollem-prod-t-01-deployment
+  namespace: rollem-prod-transitional
+spec:
+  selector:
+    matchLabels:
+      app: rollem-prod-t
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rollem-prod-t
+    spec:
+      nodeSelector:
+        doks.digitalocean.com/node-pool: pool-rollem
+      containers:
+      - name: rollem-prod-t-01
+        image: rollem/discord:date-2025.02.18-07.25--pr-236--sha-568e0a0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: web
+          containerPort: 8081
+        resources:
+          requests:
+            cpu: 75m
+            memory: 300M
+        env:
+        - name: 'reboot'
+          value: '2023-10-09.2'
+        - name: DISCORD_BOT_SHARDSET_ID
+          value: '1'
+        - name: DISCORD_BOT_SHARDSET_COUNT
+          value: '12'
+        - name: DISCORD_BOT_SHARDSET_SHARDS_PER_SET
+          value: '16'
+        - name: DISCORD_BOT_SHARDSET_RATELIMIT_BUCKETS_FORCE
+          value: '16'
+        - name: DISCORD_BOT_SHARDSET_RATELIMIT_BUCKETS_IGNORE
+          value: 'false'
+        - name: ROLLEM_LOCAL_DIAGNOSTIC_MODE
+          value: 'false'
+        - name: OPENTELEMETRY_ATTR_SERVICE_NAME
+          value: 'prod.discord.rollem.rocks'
+        - name: OPENTELEMETRY_ATTR_SERVICE_VERSION
+          value: 'rollem-prod-t'
+
+        - name: 'DISCORD_BOT_USER_TOKEN'
+          valueFrom:
+            secretKeyRef:
+              name: rollem-prod
+              key: DISCORD_BOT_USER_TOKEN
+        - name: 'APPINSIGHTS_CONNECTIONSTRING'
+          valueFrom:
+            secretKeyRef:
+              name: rollem-prod
+              key: APPINSIGHTS_CONNECTIONSTRING
+        - name: 'DEFER_TO_CLIENT_IDS'
+          valueFrom:
+            secretKeyRef:
+              name: rollem-prod
+              key: DEFER_TO_CLIENT_IDS
+        - name: 'DB_CONNECTION_STRING'
+          valueFrom:
+            secretKeyRef:
+              name: rollem-prod
+              key: DB_CONNECTION_STRING

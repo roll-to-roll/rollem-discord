@@ -8,7 +8,7 @@ export const connectionOptions: PostgresConnectionOptions = {
   url: process.env.DB_CONNECTION_STRING,
   ssl: process.env.DB_DISABLE_SSL ? false : { rejectUnauthorized: false },
   synchronize: false,
-  logging: true,
+  logging: (process.env.DB_ENABLE_LOGGING ?? "false").toLowerCase() === "true",
   entities: [User, UserFlags, UserSiteData],
   migrations: ["src/storage/migrations/**/*.ts"],
   subscribers: ["src/storage/subscriber/**/*.ts"],

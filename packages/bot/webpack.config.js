@@ -3,16 +3,29 @@ const nodeExternals = require('webpack-node-externals');
 const path = require('path');
 
 const config = {
-  entry: './src/discord/rollem-bot/bot.ts',
+  entry: {
+    entrypoint: {
+      import: './src/entrypoint.ts',
+      filename: "bundle.js",
+    },
+    // entrypointSingleShard: {
+    //   import: './src/entrypoint-single-shard.ts',
+    //   filename: "bundle-single-shard.js",
+    // },
+  },
   target: 'node',
   externals: [nodeExternals()], // in order to ignore all modules in node_modules folder
   ignoreWarnings: [
     { message: /the request of a dependency is an expression/, }, // TypeORM spams these
     { message: /supports-color.*?a peer dependency/ }, // I blame TypeORM 
+    { message: /Can't resolve '.*?opentelemetry.*?'/ }, // https://github.com/open-telemetry/opentelemetry-js/issues/4434
     { message: /tried to access .*?\(a peer dependency\) but it isn't provided by its ancestors/ }, // Appears to be a Yarn Berry bug https://github.com/yarnpkg/berry/issues/5153
   ],
   plugins: [
     // TODO: I'm not sure why all these are showing up here, since I thought they'd be already excluded from the dependencies list by the bundling?
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/exporter-trace-otlp-grpc$/}), // typeorm peer dependency
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/exporter-logs-otlp-grpc$/}), // typeorm peer dependency
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/exporter-logs-otlp-grpc$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^pg-native$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^react-native-sqlite-storage$/}), // typeorm peer dependency
     new IgnorePlugin({ resourceRegExp: /^mysql$/}), // typeorm peer dependency
@@ -35,12 +48,13 @@ const config = {
     new IgnorePlugin({ resourceRegExp: /^stack-chain$/, contextRegExp: /cls-hooked/ }), // cls-hooked dependency
     new IgnorePlugin({ resourceRegExp: /^bufferutil$/ }), // ws peer dependency
     new IgnorePlugin({ resourceRegExp: /^utf-8-validate$/ }), // ws peer dependency
-    new IgnorePlugin({ resourceRegExp: /^@azure\/opentelemetry-instrumentation-azure-sdk$/ }), // ws peer dependency
-    new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/instrumentation$/ }), // ???
-    new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/api$/ }), // ???
-    new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/sdk-trace-base$/ }), // ???
-    new IgnorePlugin({ resourceRegExp: /^@azure\/functions-core$/ }), // ???
-    new IgnorePlugin({ resourceRegExp: /^applicationinsights-native-metrics$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@azure\/opentelemetry-instrumentation-azure-sdk$/ }), // ws peer dependency
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/instrumentation$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/api$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/sdk-trace-base$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@azure\/functions-core$/ }), // ???
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/winston-transport$/}), // peer dependency
+    // new IgnorePlugin({ resourceRegExp: /^@opentelemetry\/exporter-jaeger$/}), // peer dependency
   ],
   node: {
     global: true,
@@ -62,10 +76,11 @@ const config = {
     ],
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js", ".pegjs"],
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', ".pegjs"],
     alias: {
-      "@bot": path.resolve(__dirname, "src/discord/rollem-bot/"),
+      "@bot": path.resolve(__dirname, "src/platform/discord/rollem-bot/"),
       "@common": path.resolve(__dirname, "src/common/"),
+      "@root": path.resolve(__dirname, "src/"),
     },
   },
   devtool: 'cheap-module-source-map',

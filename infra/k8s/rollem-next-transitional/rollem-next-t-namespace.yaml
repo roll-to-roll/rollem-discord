@@ -1,0 +1,6 @@
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: rollem-next-transitional
+  labels:
+    name: rollem-next-transitional
