@@ -34,6 +34,7 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
 
   public on<TEvent extends keyof ClientEvents>(event: TEvent, listener: ListenerFunc<TEvent>): this {
     if (!this.root) { debugger; }
+    // console.debug("#### CreateContext", event);
     this.root.ensure(event, (_key, _coll) => {
       const rootEventFn = async (...args: ClientEvents[TEvent]) => await this.onInternalRoot(event, ...args);
       super.on(event, rootEventFn);
@@ -74,7 +75,7 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
     switch (event) {
       case 'messageCreate':
         const message = (args as ClientEvents['messageCreate'])?.[0];
-        return RollemContext.set({
+        const messageContextLabels = {
           isBot: message.author.bot,
           isRollem: message.author.id === this.application?.client.user.id,
           isDM: message.channel.isDMBased(),
@@ -87,8 +88,11 @@ export class DiscordClientWithTelemetry extends Client<boolean> {
           shard: BorgName.indexOfCount(
             message.guild?.shardId ?? 0,
             ENV_CONFIG.shardSetInfo.totalShards),
-        });
+        };
+        // console.debug("#### CreateContext", event, messageContextLabels, message.content);
+        return RollemContext.set(messageContextLabels);
       default:
+        // console.debug("#### CreateContext", event);
         return context.active();
     }
   }

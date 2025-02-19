@@ -35,22 +35,23 @@ export class DeadmanSwitchBehavior extends DiscordBehaviorBase {
       this.logDiscordActivity();
     });
 
-    this.client.on('typingStart', () => this.logDiscordActivity());
+    // this.client.on('typingStart', () => this.logDiscordActivity());
     // this.client.on('typingStop', () => this.logDiscordActivity());
-    this.client.on('presenceUpdate', () => this.logDiscordActivity());
-    this.client.on('userUpdate', () => this.logDiscordActivity());
+    // this.client.on('presenceUpdate', () => this.logDiscordActivity());
+    // this.client.on('userUpdate', () => this.logDiscordActivity());
     // this.client.on("debug", function(info){
     //     console.log(`debug -> ${info}`);
     // });
-    this.client.on('messageReactionAdd', (reaction, user) => this.logDiscordActivity());
-    this.client.on('messageReactionRemove', (reaction, user) => this.logDiscordActivity());
-    this.client.on('messageReactionRemoveAll', (message) => this.logDiscordActivity());
+    // this.client.on('messageReactionAdd', (reaction, user) => this.logDiscordActivity());
+    // this.client.on('messageReactionRemove', (reaction, user) => this.logDiscordActivity());
+    // this.client.on('messageReactionRemoveAll', (message) => this.logDiscordActivity());
+    // this.client.on('voiceStateUpdate', (oldMember, newMember) => this.logDiscordActivity());
+
     this.client.on('messageUpdate', (oldMessage, newMessage) => this.logDiscordActivity());
     this.client.on('guildUnavailable', guild => {
       this.logger.trackError(LoggerCategory.SystemEvent, `Guild Unvailable (id: ${guild.id})`);
       this.logDiscordActivity();
     });
-    this.client.on('voiceStateUpdate', (oldMember, newMember) => this.logDiscordActivity());
 
     this.client.on('warn', info => this.logger.trackError(LoggerCategory.SystemEvent, "warning - " + info));
     this.client.on('rateLimit', info => {
